@@ -1,0 +1,9 @@
+@import "../../../assets/scss/main.scss";
+
+.input-multiline {
+	@extend .input-base;
+	@extend .min-width;
+	@extend .input-hover-outline;
+	@extend .input-focus;
+	resize: vertical;
+}

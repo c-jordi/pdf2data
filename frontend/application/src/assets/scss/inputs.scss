@@ -1,0 +1,126 @@
+@import "./colors.scss";
+@import "./size.scss";
+
+.button-mock {
+	border: 1px solid $color-highlight;
+	border-radius: 3px;
+	background-color: $color-white;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.button-base {
+	padding: 12px;
+	border-radius: 3px;
+	border: 1px solid $color-highlight;
+	letter-spacing: 0.25px;
+	font-family: inherit;
+	font-size: 14px;
+	background-color: $color-white;
+	cursor: pointer;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	svg {
+		height: 16px;
+		width: 16px;
+		margin-right: 8px;
+	}
+}
+
+.button-base:hover {
+	color: $color-primary;
+}
+
+.input-base {
+	@extend .text-input;
+	padding: 12px;
+	border-radius: 3px;
+	border: 1px solid $color-highlight;
+	background-color: $color-white;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	svg {
+		height: 16px;
+		width: 16px;
+	}
+
+	* {
+		margin-right: 8px;
+	}
+
+	*:last-child {
+		margin-right: 0px;
+	}
+}
+
+.input-base::placeholder {
+	color: $color-placeholder;
+}
+
+.input-hover-outline:hover {
+	border: 1px solid $color-secondary;
+	outline: none;
+}
+
+.input-hover-highlight:hover {
+	background: $color-bluelight;
+}
+
+.input-focus:focus {
+	border: 1px solid $color-primary;
+	outline: none;
+}
+
+textarea.input-base {
+	min-height: 64px;
+	height: 84px;
+	max-height: 150px;
+}
+
+.input-base-contour {
+	@extend .text-input;
+	border-radius: 3px;
+	border: 1px solid $color-highlight;
+	background-color: $color-white;
+	overflow: hidden;
+}
+
+.pointer {
+	user-select: none;
+	cursor: pointer;
+}
+
+.pointer:active {
+	border: 1px solid $color-primary;
+
+	&,
+	* {
+		fill: $color-primary;
+		color: $color-primary;
+	}
+}
+
+.selected {
+	color: $color-primary;
+	border: 1px solid $color-primary;
+}
+
+.locked,
+.locked:hover,
+.locked:active {
+	border: 1px solid $color-highlight;
+	background-color: $color-background;
+	cursor: default;
+
+	* {
+		color: $color-placeholder;
+		fill: $color-placeholder;
+	}
+}

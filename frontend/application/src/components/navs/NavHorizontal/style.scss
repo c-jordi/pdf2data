@@ -1,0 +1,39 @@
+@import "./../../../assets/scss/main.scss";
+
+$item-spacing: 30px;
+
+.nav-horizontal {
+	@extend .v-margin;
+
+	.menu {
+		display: flex;
+		flex-direction: row;
+
+		.item {
+			cursor: pointer;
+			margin-right: $item-spacing;
+			color: $color-placeholder;
+			user-select: none;
+
+			&:hover {
+				color: $color-dark;
+			}
+
+			&.active {
+				color: $color-dark;
+			}
+
+			&.active[data-version="0"] {
+				border-bottom: $size-hoverline solid $color-primary;
+			}
+
+			&[data-version="1"] {
+				font-size: 13px;
+			}
+
+			&:last-child {
+				margin-right: 0px;
+			}
+		}
+	}
+}

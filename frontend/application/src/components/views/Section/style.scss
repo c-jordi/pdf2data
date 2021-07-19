@@ -1,0 +1,18 @@
+@import "../../../assets/scss/main.scss";
+
+.section {
+	margin-top: 22px;
+	margin-bottom: 34px;
+
+	.header {
+		@extend .text-headline;
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+
+	.caption {
+		@extend .text-caption;
+		margin-top: 10px;
+		margin-bottom: 16px;
+	}
+}

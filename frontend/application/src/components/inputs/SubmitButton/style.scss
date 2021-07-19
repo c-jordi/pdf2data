@@ -1,0 +1,27 @@
+@import "../../../assets/scss/main.scss";
+
+.input-submit {
+	@extend .min-width;
+	border-radius: 3px;
+	padding: 12px 20px;
+	border: 1px solid $color-highlight;
+	letter-spacing: 1.25px;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: medium;
+	color: $color-white;
+	background-color: $color-primary;
+	text-transform: uppercase;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	cursor: pointer;
+}
+
+.input-submit:hover {
+	background-color: $color-secondary;
+}
+
+.input-submit[disable] {
+	background-color: $color-highlight;
+	cursor: default;
+}

@@ -1,0 +1,67 @@
+@import "./colors.scss";
+
+.text-title {
+	font-size: 48px;
+	color: $color-dark;
+	font-weight: normal;
+	letter-spacing: 0px;
+	margin: 20px 0;
+}
+
+.text-subtitle {
+	font-size: 34px;
+	color: $color-text;
+	font-weight: normal;
+	letter-spacing: 0.25px;
+	margin: 16px 0;
+}
+
+.text-headline {
+	font-size: 20px;
+	font-weight: medium;
+	letter-spacing: 0.15px;
+}
+
+.text-body {
+	font-size: 14px;
+	font-weight: normal;
+	letter-spacing: 0.25px;
+	color: $color-text;
+}
+
+.text-caption {
+	font-size: 14px;
+	font-weight: normal;
+	letter-spacing: 0.25px;
+	color: $color-caption;
+}
+
+.text-button {
+	font-size: 14px;
+	font-weight: medium;
+	letter-spacing: 1.25px;
+	text-transform: uppercase;
+}
+
+.text-input {
+	letter-spacing: 0.25px;
+	font-family: inherit;
+	font-size: 14px;
+}
+
+h1 {
+	@extend .text-title;
+}
+
+h2 {
+	@extend .text-subtitle;
+}
+
+p {
+	@extend .text-body;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}

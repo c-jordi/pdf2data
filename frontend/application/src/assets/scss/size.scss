@@ -1,0 +1,29 @@
+// padding, margin
+$size-innerpadding: max(3vw, 14vw);
+$size-minwidth: 200px;
+$size-width: 90%;
+$size-v-margin: 10px;
+$size-v-margin-l: 20px;
+
+// Line width
+$size-hoverline: 4px;
+
+// Lists
+$size-ul-parent-height: 60px;
+$size-ul-child-height: 50px;
+
+.min-width {
+	min-width: $size-minwidth;
+	width: $size-width;
+	max-width: $size-width;
+}
+
+.v-margin {
+	margin-top: $size-v-margin;
+	margin-bottom: $size-v-margin;
+}
+
+.v-margin-l {
+	margin-top: $size-v-margin-l;
+	margin-bottom: $size-v-margin-l;
+}

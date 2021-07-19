@@ -1,0 +1,21 @@
+@import "../../../assets/scss/main.scss";
+
+.small-search-bar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	svg {
+		height: 13px;
+		width: 13px;
+		cursor: pointer;
+	}
+
+	input {
+		margin-left: 5px;
+		border: none;
+		outline: none;
+		font-size: 12px;
+		line-height: 13px;
+	}
+}

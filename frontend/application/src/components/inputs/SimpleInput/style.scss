@@ -1,0 +1,41 @@
+@import "../../../assets/scss/main.scss";
+
+.input-simple-container {
+	position: relative;
+}
+
+.input-simple {
+	@extend .input-base;
+	@extend .min-width;
+	@extend .input-hover-outline;
+	@extend .input-focus;
+
+	&[data-extended="true"] {
+		border-radius: 3px 3px 0px 0px;
+	}
+}
+
+.input-suggestions {
+	@extend .min-width;
+	position: absolute;
+	background-color: $color-white;
+	border-radius: 0px 0px 3px 3px;
+	padding-bottom: 5px;
+	background-color: $color-white;
+	border: 1px solid $color-primary;
+	border-top: none;
+}
+
+.input-suggestion {
+	@extend .input-base;
+	@extend .input-hover-highlight;
+	box-sizing: border-box;
+	border: none;
+	cursor: pointer;
+	border-radius: 0px;
+}
+
+.input-container {
+	display: flex;
+	flex-direction: column;
+}

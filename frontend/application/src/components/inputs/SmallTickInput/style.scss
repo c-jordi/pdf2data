@@ -1,0 +1,33 @@
+@import "../../../assets/scss/main.scss";
+
+.small-input-tick {
+	cursor: pointer;
+	margin: 0px 12px;
+	display: flex;
+	align-items: center;
+
+	&:first-child {
+		margin-left: 0px;
+	}
+
+	.tick {
+		height: 14px;
+		width: 14px;
+		border-radius: 3px;
+		background-color: $color-white;
+		border: 1px solid $color-highlight;
+		display: flex;
+		align-items: center;
+
+		svg {
+			height: 100%;
+			width: 100%;
+			color: $color-primary;
+		}
+	}
+
+	.label {
+		padding-left: 8px;
+		font-size: 12px;
+	}
+}

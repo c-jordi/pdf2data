@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  rabbitmq:
+    image: "rabbitmq:3.8-management-alpine"
+    ports:
+      # The standard AMQP protocol port
+      - "5672:5672"
+      # HTTP management UI
+      - "15672:15672"
+    networks:
+      - network
+
+networks:
+  network: {}

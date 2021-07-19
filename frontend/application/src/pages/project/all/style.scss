@@ -1,0 +1,12 @@
+@import "./../../../assets/scss/main.scss";
+
+.projects-header {
+	display: flex;
+	flex-direction: row;
+	margin-top: 32px;
+
+	h2 {
+		margin-top: 0px;
+		flex-grow: 1;
+	}
+}

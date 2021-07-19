@@ -1,0 +1,24 @@
+@import "../../../assets/scss/main.scss";
+
+.input-tick {
+	height: 18px;
+	width: 18px;
+	border-radius: 3px;
+	background-color: $color-white;
+	border: 1px solid $color-highlight;
+	cursor: pointer;
+	margin: 0px 14px;
+	display: flex;
+	align-items: center;
+
+	svg {
+		height: 100%;
+		width: 100%;
+		color: $color-white;
+	}
+
+	&[data-ticked="true"] {
+		background-color: $color-highlight;
+		border: 1px solid $color-highlight;
+	}
+}
