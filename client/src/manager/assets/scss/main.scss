@@ -1,0 +1,10 @@
+// Importing substyling
+@import "../../../shared/assets/colors.scss";
+@import "../../../shared/assets/text.scss";
+@import "./size.scss";
+@import "./inputs.scss";
+@import "./shapes.scss";
+
+* {
+	box-sizing: border-box;
+}
