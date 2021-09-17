@@ -1,0 +1,37 @@
+@import "../../../assets/scss/main.scss";
+
+.d-labelinput {
+	display: flex;
+	align-items: flex-start;
+	max-width: 90%;
+	gap: 8px 10px;
+	flex-wrap: wrap;
+
+	.label {
+		border: 1px solid $color-highlight;
+		border-radius: 3px;
+		font-size: 12px;
+		padding: 6px;
+		user-select: none;
+		cursor: pointer;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		.ind {
+			width: 10px;
+			height: 10px;
+			border-radius: 50%;
+			margin-right: 4px;
+		}
+
+		&:hover {
+			border: 1px solid $color-caption;
+		}
+
+		&:active,
+		&.active {
+			border: 1px solid $color-primary;
+		}
+	}
+}

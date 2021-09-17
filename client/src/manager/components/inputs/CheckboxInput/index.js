@@ -24,7 +24,7 @@ CheckboxInput.defaultProps = {
         {label: 'Option 2', value: 'option2', icon : ""},
     ],
 	required: false,
-    onChange : (log) => {console.log(log)}
+    onChange : console.log
 };
 
 

@@ -1,0 +1,15 @@
+@import "./../../../assets/scss/main.scss";
+
+.panel {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	background-color: $color-white;
+	border-right: 1px solid $color-highlight;
+	border-left: 1px solid $color-highlight;
+}
+
+.panel-box {
+	display: flex;
+	border-bottom: 1px solid $color-highlight;
+}

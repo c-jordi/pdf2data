@@ -1,0 +1,19 @@
+@import "../../../assets/scss/main.scss";
+
+.d-multiline {
+	border: 1px solid $color-highlight;
+	border-radius: 3px;
+	width: 95%;
+	height: 200px;
+	padding: 6px;
+	resize: none;
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: normal;
+
+	&:focus,
+	&:active {
+		border: 1px solid $color-primary;
+		outline: none;
+	}
+}

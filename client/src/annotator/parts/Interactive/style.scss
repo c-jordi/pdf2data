@@ -1,0 +1,25 @@
+@import "../../assets/scss/main.scss";
+
+.interactive {
+	position: absolute;
+	overflow: hidden;
+
+	.overlay {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		pointer-events: none;
+
+		div {
+			position: absolute;
+			overflow: hidden;
+
+			.label {
+				padding-top: 5%;
+				padding-left: 5%;
+			}
+		}
+	}
+}

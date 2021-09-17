@@ -17,10 +17,9 @@ export function renderElement(el, state, formCallback){
     // Stateful components
     const value = (el.name && state[el.name] ? state[el.name].value : undefined);
     const onChange = (action) => {formCallback({origin:el,action})}
-    
     switch(el.type){
         case "simple":
-            props = {...el, value, onChange};
+            props = {...el, ...state[el.name], value, onChange};
             return <SimpleInput {...props}></SimpleInput>
         case "multi":
             props = {...el, value, onChange};
@@ -32,13 +31,15 @@ export function renderElement(el, state, formCallback){
             props = {...el, value, onChange}
             return <BaseListInput {...props}></BaseListInput>
         case "filelist":
-            props = {...el, value, onChange}
+            props = {...el, ...state[el.name], onChange}
             return <FileListInput {...props}></FileListInput>
         case "labellist":
-            props = {...el, value, onChange}
+            props = {...el, ...state[el.name], value, onChange}
+            console.log("Label list:",props)
             return <LabelListInput {...props}></LabelListInput>
         case "submit":
-            props = {...el, onClick: ()=> onChange(el.action)}
+            let disabled = !state.__valid || false;
+            props = {...el, onClick: ()=> onChange(el.action), disabled}
             return <SubmitButton {...props}></SubmitButton>
         default:
             return;

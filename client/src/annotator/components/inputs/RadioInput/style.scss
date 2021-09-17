@@ -1,0 +1,49 @@
+@import "../../../assets/scss/main.scss";
+
+$boxes-innermargin: 20px;
+
+.d-radio {
+	display: flex;
+	flex-direction: row;
+
+	.d-radio-box {
+		color: $color-placeholder;
+		height: 32px;
+		width: 32px;
+		border-radius: 3px;
+		border: 1px solid $color-highlight;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-right: 10px;
+		cursor: pointer;
+		user-select: none;
+
+		svg {
+			height: 16px;
+			width: 16px;
+			margin: auto;
+		}
+
+		&:hover {
+			border: 1px solid $color-caption;
+		}
+
+		&:active {
+			border: 1px solid $color-primary;
+			color: $color-primary;
+		}
+
+		&.active {
+			border: 1px solid $color-primary;
+
+			svg {
+				color: $color-primary;
+			}
+		}
+
+		&:last-child {
+			margin-right: 0px;
+		}
+	}
+}

@@ -4,9 +4,10 @@ class Dispatcher {
         this._clientCallback = null;
 
         this.notify = this.notify.bind(this)
+        this.attach = this.attach.bind(this)
     }
 
-    bind(callback){
+    attach(callback){
         this._clientCallback = callback;
     }
 

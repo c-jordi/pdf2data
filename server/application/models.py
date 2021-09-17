@@ -7,6 +7,7 @@ from tornado_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 class Project(db.Model):
     __tablename__ = 'projects'
     id = Column(Integer, primary_key=True)
@@ -17,20 +18,22 @@ class Project(db.Model):
     level = Column(String, nullable=False)
     sources = relationship("Source")
     casestudies = relationship("Casestudy")
-   
-    def __init__(self, name=None, uid="", description="No description", author="No author", level="page", sources= []):
+
+    def __init__(self, name=None, uid="", description="No description", author="No author", level="page", sources=[]):
         self.name = name
         self.uid = uid
         self.description = description
         self.author = author
         self.level = level
         self.sources = sources
-    
+
     def as_dict(self):
         data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         data["sources"] = [source.as_dict() for source in self.sources]
-        data["labels"] = [label.as_dict()  for case in self.casestudies for label in case.labels]
+        data["labels"] = [label.as_dict()
+                          for case in self.casestudies for label in case.labels]
         return data
+
 
 class Casestudy(db.Model):
     __tablename__ = "casestudies"
@@ -51,11 +54,12 @@ class Casestudy(db.Model):
     project_id = Column(Integer, ForeignKey('projects.id'))
     labels = relationship("Label")
 
-    def __init__(self, uid, name ="", description = "", author = ""):
+    def __init__(self, uid, name="", description="", author=""):
         self.uid = uid
         self.name = name
         self.description = description
         self.author = author
+
 
 class Label(db.Model):
     __tablename__ = 'labels'
@@ -74,6 +78,7 @@ class Label(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+
 class Source(db.Model):
     __tablename__ = 'sources'
     id = Column(Integer, primary_key=True)
@@ -81,18 +86,27 @@ class Source(db.Model):
     filename = Column(String, nullable=False)
     uri = Column(String, nullable=False, unique=True)
     project_id = Column(Integer, ForeignKey('projects.id'))
-    
-    def __init__(self, uid, filename, uri, project_id=None):
+    preproc_id = Column(String)
+    preproc_ok = Column(Integer, default=0)
+
+    def __init__(self, uid, filename, uri, project_id=None, preproc_id=None):
         self.uid = uid
         self.filename = filename
         self.uri = uri
         self.project_id = None
+        self.preproc_id = preproc_id
 
     def __repr__(self):
         return f"<Source: {self.filename}>"
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def update(self, data):
+        for key, value in data.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
 
 class Page(db.Model):
     __tablename__ = 'pages'
@@ -101,6 +115,7 @@ class Page(db.Model):
     source_id = Column(Integer, ForeignKey('sources.id'))
     page_number = Column(Integer, nullable=False)
     annotated = Column(Boolean, default=False)
+
 
 class Annotation(db.Model):
     __tablename__ = 'annotations'
@@ -111,7 +126,7 @@ class Annotation(db.Model):
     bbox = Column(String)
     time_labelling = Column(String)
     split = Column(String)
-    
+
 
 if __name__ == "__main__":
     db.configure(url='sqlite:///db.sqlite')

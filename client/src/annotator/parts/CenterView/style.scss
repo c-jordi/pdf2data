@@ -1,0 +1,7 @@
+@import "../../assets/scss/main.scss";
+
+.centerview {
+	// width: calc(100vw - calc(2 * #{$panel-width}));
+	flex-grow: 1;
+	height: calc(100vh - #{$header-height});
+}

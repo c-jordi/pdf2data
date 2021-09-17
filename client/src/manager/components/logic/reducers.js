@@ -27,7 +27,7 @@ export function reduceState(state, el){
         case "filelist":
             return {...state, [el.name] : {value : [{_status:"empty"}], ...meta}, _names:[..._names, el.name]}
         case "labellist":
-            return {...state, [el.name] : {value : [{_status:"empty", text:"", color:"#3e7be2", colortext: "#3e7be2"}], ...meta}, _names:[..._names, el.name]}
+            return {...state, [el.name] : {value : [{_status:"empty", text:"", color:"#3E7BE2", colortext: "#3E7BE2"}], ...meta}, _names:[..._names, el.name]}
         case "radio":
             return {...state, [el.name] : {options: el.options, value:el.options[0].value, ...meta}, _names:[..._names, el.name]}
         case "checkbox":

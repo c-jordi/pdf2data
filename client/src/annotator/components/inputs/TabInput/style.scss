@@ -1,0 +1,26 @@
+@import "../../../assets/scss/main.scss";
+
+.d-tab-input {
+	display: flex;
+	flex-direction: row;
+	padding: 12px;
+	font-size: 12px;
+}
+
+.d-tab-item {
+	color: $color-caption;
+	user-select: none;
+	margin-right: 10px;
+
+	&:hover {
+		color: grey;
+	}
+
+	&.active {
+		color: black;
+	}
+
+	&:not(.active) {
+		cursor: pointer;
+	}
+}

@@ -1,0 +1,24 @@
+.block {
+	display: flex;
+	flex-direction: column;
+	padding: 12px;
+
+	.title {
+		font-weight: bold;
+		margin-bottom: 5px;
+		font-size: 13px;
+		user-select: none;
+	}
+	.content {
+		margin-left: 4px;
+		margin-top: 8px;
+
+		& > *:not(:last-child) {
+			margin-bottom: 14px;
+		}
+
+		&.flush {
+			margin-left: 0px;
+		}
+	}
+}

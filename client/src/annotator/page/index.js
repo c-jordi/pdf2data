@@ -1,8 +1,8 @@
 import {Component} from "react"
 import {Redirect} from 'react-router-dom'
-import {Header, Body, Left, Center, Right} from "../components/views"
-import {WalkieTalkie, Dispatcher, reduceState} from "../components/logic"
-import Interactive from "../../../parts/Interactive"
+import {Header, Body} from "../components/views"
+import {WalkieTalkie, Dispatcher, AssetManager, reduceState} from "../components/logic"
+import Fullscreen from "../parts/Fullscreen"
 
 import "./style.scss";
 
@@ -15,42 +15,70 @@ class Annotator extends Component {
 		this.uid = props.uid;
 		this.ws = props.ws;
 		this.state = {
-			_redirect : false
+			assets : [],
+			_redirect : false,
 		}
+		this._loaded = false;
 
 		this.dispatcher = new Dispatcher(this.ws)
+		this.assetManager = new AssetManager()
 
 		this.updateState = this.updateState.bind(this)
+		this.getAssets = this.getAssets.bind(this)
+		this.setAssets = this.setAssets.bind(this)
+		this.update = this.update.bind(this)
 		this.check = this.check.bind(this)
-		this.invalidate = this.invalidate.bind(this)
+		this.redirect = this.redirect.bind(this)
+		this.load = this.load.bind(this)
 		this.callback = this.callback.bind(this)
-		this.check()
+		
 	}
 
 	updateState(update){
         this.setState({...this.state,...update})
     }
 
-	componentDidMount(){
-		this.load()
+	getAssets(){
+		return this.state.assets
 	}
 
-	invalidate(){
+	setAssets(assets){
+		this.setState({...this.state, assets})
+	}
+
+	componentDidMount(){
+		this.check()
+		this.connect()
+	}
+
+
+	connect(){
+		this.dispatcher.attach(this.callback)
+		this.assetManager.attach(this.getAssets, this.setAssets)
+	}
+
+	redirect(){
 		this.updateState({_redirect : true})
 	}
 
-	check(){
-		this.ws.bind("invalidated",this.invalidate).send("validate",this.uid)
+	load(){
+		if (!this._loaded) this.ws.bind("update",this.update).send("load",this.uid)
 	}
 
-	load(){
-		this.dispatcher.bind(this.callback)
+	update(data){
+		this.assetManager.update(data)
+		this.updateState({data})
 	}
+
+
+	check(){
+		this.ws.bind("invalidated",this.redirect).bind("validated",this.load).send("validate",this.uid)
+	}
+
 
 	callback(action){
 		this.setState(reduceState(this.state, action))
 	}
-
 	
 	render(){
 
@@ -60,21 +88,10 @@ class Annotator extends Component {
 
 		const {notify} = this.dispatcher;
 
+		console.log("ASSETS:",this.state.assets)
+
 		return <div className="annotator">
-			<Header notify={notify}></Header>	
-			<Body>
-				<Left></Left>
-				<Center>
-					<Interactive data={
-						{image: "http://0.0.0.0:8888/storage/test_image.png",
-						annotations: [
-							{bbox: [100,100,200,200], properties:{text:"No text", label:"Headline", color: "#9r4"}},
-							{bbox: [300,300,400,400], properties:{text:"Some more text", label:"Caption", color: "#f40"}}
-						]}
-					}></Interactive>
-				</Center>
-				<Right></Right>
-			</Body>
+				<Fullscreen notify={notify} assets={this.state.assets}/>
 		</div>
 	}
 }

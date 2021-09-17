@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import FancyWebSocket from "../../../../services/fancywebsocket";
+import FancyWebSocket from "../../../shared/services/fancywebsocket"
 
 
 class WalkieTalkie extends Component {
@@ -21,6 +21,7 @@ class WalkieTalkie extends Component {
     }
 
     onOpen(){
+        console.log("its open")
         this.updateState({_connecting:false})
     }
 

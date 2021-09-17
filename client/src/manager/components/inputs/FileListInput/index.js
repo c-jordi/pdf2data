@@ -27,8 +27,6 @@ export default class FileListInput extends BaseListInput{
     }
 
 
-
-
     renderItem(item, onChange){
         switch(item._status){
             case "empty":

@@ -5,21 +5,21 @@ $boxes-innermargin: 20px;
 .input-checkbox {
 	display: flex;
 	flex-direction: row;
-}
 
-.input-box {
-	@extend .input-base;
-	@extend .input-hover-outline;
-	@extend .pointer;
-	margin-right: $boxes-innermargin;
-	color: $color-placeholder;
-}
+	.input-box {
+		@extend .input-base;
+		@extend .input-hover-outline;
+		@extend .pointer;
+		margin-right: $boxes-innermargin;
+		color: $color-placeholder;
+	}
 
-.input-box.active {
-	@extend .input-focus;
-	color: $color-primary;
-}
+	&.active {
+		@extend .input-focus;
+		color: $color-primary;
+	}
 
-.input-box:last-child {
-	margin-right: 0px;
+	&:last-child {
+		margin-right: 0px;
+	}
 }

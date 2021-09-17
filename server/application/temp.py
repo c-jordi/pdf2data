@@ -1,0 +1,1 @@
+test_img_url = "https://tile.loc.gov/image-services/iiif/service:gdc:dcmsiabooks:co:ns:ti:tu:ti:on:of:un:00:un:it:_1:0:constitutionofun00unit_10:constitutionofun00unit_10_0003/full/pct:50/0/default.jpg"

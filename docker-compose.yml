@@ -1,11 +1,32 @@
-version: "3.7"
+version: "3.9"
 services:
+  # web:
+  #   build:
+  #     context: ./server
+  #     dockerfile: ./docker/web
+  #   container_name: web
+  #   ports:
+  #     - "8888:8888"
+  #   volumes:
+  #     - .:/server
+  #   depends_on:
+  #     - rabbitmq
+
+  # worker:
+  #   build:
+  #     context: ./server
+  #     dockerfile: ./docker/worker
+  #   container_name: worker
+  #   volumes:
+  #     - .:/server
+  #   depends_on:
+  #     - rabbitmq
+  #     - web
+
   rabbitmq:
-    image: "rabbitmq:3.8-management-alpine"
+    image: "rabbitmq:3.9.5-management-alpine"
     ports:
-      # The standard AMQP protocol port
       - "5672:5672"
-      # HTTP management UI
       - "15672:15672"
     networks:
       - network

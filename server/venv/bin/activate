@@ -46,7 +46,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV='/home/jordi/Documents/pdf2data/backend/venv'
+VIRTUAL_ENV='/home/jordi/Documents/pdf2data/server/venv'
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

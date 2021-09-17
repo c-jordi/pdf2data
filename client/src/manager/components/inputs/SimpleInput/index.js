@@ -1,6 +1,38 @@
 import PropTypes from "prop-types";
+import {useState} from "react";
 
 import "./style.scss";
+
+const InputRequired = (props) => {
+	return <div className="input-notrequired"></div>
+}
+
+const InputErrors = ({_validation = {}}) => {
+	const { is_valid, errors} = _validation;
+	const msgDuration = 3000;
+	const [clickTime, setClickTime] = useState(new Date().getTime() - msgDuration * 2)
+
+	if (is_valid) return <div className='input-errors-none'></div>
+
+	const handleClick = () => {
+		setClickTime(new Date().getTime());
+	}
+
+
+	const renderMsg = (clickTime) => {
+		const delta = new Date().getTime() - clickTime;
+		if (delta < msgDuration){
+			setTimeout(()=>{setClickTime(new Date().getTime() - msgDuration * 2)}, msgDuration - delta)
+			return <div className="input-errors-msg">{errors[0]}</div>
+		}
+		return <div className="input-errors-nomsg"></div>
+	}
+
+	return <>
+	<div className="input-errors-icon" onClick={handleClick}>!</div>
+	 {renderMsg(clickTime)}
+	</>
+}
 
 const InputSuggestions = ({options, onChange}) => {
 
@@ -53,8 +85,9 @@ const InputContainer = (props) => {
 
 	return (
 		<div className="input-simple-container">
-			<SimpleInput isExtended={isExtended} {...props}></SimpleInput>
+			<SimpleInput isExtended={isExtended} {...props}></SimpleInput> 
 			<InputSuggestions {...props}></InputSuggestions>
+			<InputErrors {...props}></InputErrors>
 		</div>	
 	);
 };

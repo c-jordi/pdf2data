@@ -1,0 +1,46 @@
+@import "../../../assets/scss/main.scss";
+
+.d-tick-input {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-right: 12px;
+	user-select: none;
+	cursor: pointer;
+
+	.btn {
+		height: 12px;
+		width: 12px;
+		border-radius: 3px;
+		background-color: $color-white;
+		border: 1px solid $color-highlight;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		margin-right: 6px;
+		x svg {
+			height: 100%;
+			width: 100%;
+			color: $color-primary;
+		}
+
+		&[data-ticked="true"] {
+			border: 1px solid $color-highlight;
+		}
+	}
+
+	.label {
+		font-size: 12px;
+	}
+
+	&:active {
+		.btn {
+			border: 1px solid $color-primary;
+		}
+	}
+}
+
+.d-ticks {
+	display: flex;
+	flex-direction: row;
+}

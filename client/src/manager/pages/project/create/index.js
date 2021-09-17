@@ -2,9 +2,9 @@ import React from "react";
 import {Container, Section} from "../../../components/views";
 import Sidebar from "../../../parts/Sidebar"
 import FormHandler from "../../../parts/Form";
+import {BiAlignJustify, BiMenu, BiText} from "react-icons/bi"
 import "./style.scss";
 
-import {BiAlignJustify, BiMenu, BiText } from "react-icons/bi";
 
 const formParams = {
 	name : "new-project-form",
@@ -16,13 +16,13 @@ const formParams = {
 const formContent = [
 	{type:"title", content: "Project information"},
 	{type:"section", header: "Name",caption:"Helpful to quickly find your project", content:[
-		{type:"simple", name: "project_name", placeholder:"Enter a name", required:true, validation: "string.string>5.string<50"},
+		{type:"simple", name: "project_name", placeholder:"Enter a name", validation: "string.string>5.string<50"},
 	]},
 	{type:"section", header: "Description", caption: "Describe your project in a couple words", content:[
 		{type:"multi", name: "project_desc", placeholder:"Enter a description"}
 	]},
 	{type:"section", header: "Author", caption: "If multiple, seperate names with comma", content:[
-		{type:"simple", name: "project_auth", placeholder:"Enter author name(s)"}
+		{type:"simple", name: "project_auth", placeholder:"Enter author name(s)", validation: "string.string>3.letters&commas"}
 	]},
 	{type:"title", content:"Experiment definition"},
 	{type:"section", header: "Document level", caption: "Once the project has been created, you will not be able to change the document level.", content:[
@@ -33,10 +33,10 @@ const formContent = [
 		]}
 	]},
 	{type:"section", header: "Source folders", caption:"Select the folders containing the data you would like to use in the experiment.", content:[
-		{type:"filelist", name:"project_src"}
+		{type:"filelist", name:"project_src", validation:"oneuploadmin"}
 	]},
 	{type:"section", header: "Labels", caption: "Enter the labels that will be used in the classification", content:[
-		{type:"labellist", name:"project_labels"}
+		{type:"labellist", name:"project_labels", validation: "validlabelcolor.validlabeltext.uniquelabelcolor.uniquelabeltext"}
 	]},
 	{type:"submit", name: "submit_btn", label:"Create project", action: {type:"send"}}
 ]

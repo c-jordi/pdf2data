@@ -70,7 +70,6 @@ class BaseList extends Component {
             return <div className="item" key={i} onClick={onClick}{...{"data-selected": +selected === i}}>{this.renderItem(item,itemOnChange)}</div>
     })}
 
-    // --- Methods to customize in a new class
 
     createItem(){
         return ""

@@ -1,16 +1,16 @@
 import React, {Component} from "react"
 import { Redirect } from 'react-router-dom'
 import {reduceState, reduceCallback,renderElement, validateState} from "../../components/logic"
-import {saveObject, getSavedObject, clearSavedObjects} from "../../services/autosave.ts"
+import {saveObject, getSavedObject, clearSavedObjects} from "../../../shared/services/autosave"
 import PropTypes from "prop-types"
 import FormUpload from "./FormUpload";
 
 export default class FormHandler extends Component {
     constructor(props){
-        super(props);
+        super(props);     
         
-        this.state = this.createState()
-
+        this.state = this.verify(this.createState())
+        
         this.formCallback = this.formCallback.bind(this)
         this.prefix = this.props.params.name + '-';
         this.loadSavedState = this.loadSavedState.bind(this)
@@ -29,8 +29,13 @@ export default class FormHandler extends Component {
         return newState
     }
 
+    verify(state){
+        const temp = validateState(state)
+        console.log(temp)
+        return temp
+    }
+
     runMethod({origin,action}){
-        console.log("run method:",action)
         switch (action.type){
             case "send":
                 return this.sendForm()
@@ -43,6 +48,7 @@ export default class FormHandler extends Component {
         this._redirect = true;
         this.setState({})
     }
+
 
     sendForm(){
         this.clearSavedState()
@@ -68,7 +74,7 @@ export default class FormHandler extends Component {
         }   
         // State callback
         else {
-            this.setState(reduceCallback(this.state,callObj))
+            this.setState(this.verify(reduceCallback(this.state,callObj)))
         }
     }
 
@@ -86,7 +92,6 @@ export default class FormHandler extends Component {
     }
     
 }
-
 
 FormHandler.propTypes = {
     params : PropTypes.exact({

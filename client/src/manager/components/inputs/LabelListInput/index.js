@@ -1,5 +1,5 @@
 import BaseListInput from "../BaseListInput";
-import {getRandomColor, isColorValid} from "../../../services/utils"
+import {getRandomColor, isColorValid} from "../../../../shared/services/utils"
 
 import "./style.scss";
 

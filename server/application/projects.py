@@ -1,6 +1,7 @@
 from uuid import uuid4
 from .models import Casestudy, Project, Source, Label
 
+
 def get_all(session):
     """Returns a list of all the projects
     """
@@ -16,7 +17,6 @@ def add(session, req):
         req : object
             New project request data
     """
-
     new_project = create_new_project(req)
     session.add(new_project)
     session.commit()
@@ -35,7 +35,6 @@ def add(session, req):
         label.casestudy_id = new_case.id
     session.commit()
     return "ok"
-    
 
 
 def create_new_project(req):
@@ -54,6 +53,7 @@ def create_new_project(req):
     data["level"] = req["data"]["project_lvl"]["value"]
 
     return Project(**data)
+
 
 def create_new_casestudy(req):
     return Casestudy(uid=uuid4().hex)
@@ -77,7 +77,8 @@ def add_labels(session, req):
             session.add(new_label)
             out.append(new_label)
     return out
-    
+
+
 def load_sources(session, req):
     """Load the project sources
 
@@ -90,5 +91,5 @@ def load_sources(session, req):
     out = []
     sources = req["data"]["project_src"]["value"]
     for source in sources:
-        out.append(session.query(Source).filter_by(uid = source["uid"]).first())
+        out.append(session.query(Source).filter_by(uid=source["uid"]).first())
     return out
