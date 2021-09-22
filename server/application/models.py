@@ -78,6 +78,13 @@ class Label(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+"""
+File naming convention:
+uid: unique id generated with uuid4().hex
+filename: original name of the file, and for newly created files, simplified 
+    name in case the file needs to be exported
+uri: the localhost location of the file + uid + _ + filename
+"""
 
 class Source(db.Model):
     __tablename__ = 'sources'

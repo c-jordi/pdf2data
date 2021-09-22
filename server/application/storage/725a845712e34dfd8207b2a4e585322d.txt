@@ -1,3 +1,0 @@
-Worm Algorithms for Classical Statistical Models
-Nikolay Prokof'ev and Boris Svistunov
-https://doi.org/10.1103/PhysRevLett.87.160601
