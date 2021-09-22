@@ -2,7 +2,10 @@
 .vscode
 __pycache__
 .pytest_cache
+*.pyc
 _*.txt
 venv
 server/application/test.py
 server/test.py
+db.sqlite
+server/application/storage/*
