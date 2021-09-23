@@ -15,9 +15,9 @@ def read_message(session, message):
                     }
                     },
                     {"type": "annotations", "id": "ann-0", "data": [
-                        {"bbox": [100, 100, 300, 300],
+                        {"bbox": [100, 100, 200, 200],
                          "label": "Title", "color": "purple"},
-                        {"bbox": [200, 200, 400, 300],
+                        {"bbox": [240, 250, 400, 300],
                          "label": "Speech", "color": "blue"}
                     ]
                     }
