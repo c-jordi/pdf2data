@@ -1,4 +1,5 @@
 import {useRef, useEffect} from "react"
+import {MdFilterCenterFocus} from "react-icons/md";
 import {ViewController} from "../../components/logic"
 import PropTypes from "prop-types"
 import "./style.scss"
@@ -21,6 +22,7 @@ const Interactive = (props) => {
 
     useEffect(() => {
         view.attach(canvasRef.current, overlayRef.current)
+        view.connect(props.notify)
         view.append(props.assets)
         view.display()
 
@@ -29,7 +31,12 @@ const Interactive = (props) => {
 
 
     return <div className='interactive' style={coords} >
-        <div className="overlay" ref={overlayRef} width={coords.width} height={coords.height}/>
+        <div className="overlay" ref={overlayRef} width={coords.width} height={coords.height}>
+            <div className="controls">
+                <div className="recenter"><MdFilterCenterFocus/></div>
+            </div>
+            <div className="background"></div>
+        </div>
         <canvas ref={canvasRef} width={coords.width} height={coords.height}/> 
     </div>
 }

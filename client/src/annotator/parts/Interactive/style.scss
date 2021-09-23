@@ -10,16 +10,70 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		pointer-events: none;
+		user-select: none;
 
-		div {
+		.box {
 			position: absolute;
 			overflow: hidden;
+			z-index: 1;
+			cursor: pointer;
 
 			.label {
 				padding-top: 5%;
 				padding-left: 5%;
 			}
+		}
+
+		.background {
+			position: absolute;
+			inset: 0 0 0 0;
+			z-index: 0;
+		}
+
+		.controls {
+			position: absolute;
+			bottom: 20px;
+			right: 30px;
+			display: flex;
+			flex-direction: row;
+			z-index: 2;
+
+			.recenter {
+				height: 30px;
+				width: 30px;
+				display: flex;
+				border-radius: 3px;
+				border: 1px solid $color-highlight;
+				background-color: white;
+				cursor: pointer;
+				transition-duration: 0.3s;
+				display: none;
+				opacity: 0;
+
+				svg {
+					height: 70%;
+					width: 70%;
+					margin: auto;
+					color: $color-highlight;
+				}
+
+				&:hover {
+					border: 1px solid $color-primary;
+
+					svg {
+						color: $color-primary;
+					}
+				}
+			}
+		}
+
+		&[data-selection-active="true"] .box:hover {
+			cursor: pointer;
+		}
+
+		&[data-recenter-active="true"] .controls .recenter {
+			display: inherit;
+			opacity: 1;
 		}
 	}
 }
