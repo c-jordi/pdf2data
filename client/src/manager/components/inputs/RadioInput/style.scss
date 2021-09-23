@@ -12,11 +12,11 @@ $boxes-innermargin: 20px;
 		@extend .pointer;
 		margin-right: $boxes-innermargin;
 		color: $color-placeholder;
-	}
 
-	&.active {
-		@extend .input-focus;
-		color: $color-primary;
+		&.active {
+			@extend .input-focus;
+			color: $color-primary;
+		}
 	}
 
 	&:last-child {

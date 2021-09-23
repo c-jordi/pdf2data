@@ -1,13 +1,17 @@
+import {saveObject, getSavedObject} from "../../../shared/services/autosave";
+
 class ViewController {
     constructor(){
         this.canvas = null;
         this.context = null;
         this.overlay = null;
+        this.background = null;
         this.assets = null;
         this.image = null;
         this.annotations = null;
         this.queue = [];
         this.frameId = null;
+        this._cachetime = 0;
 
         this.view = {
             dx : 0,
@@ -18,7 +22,7 @@ class ViewController {
             sHeight : 0,
             dWidth : 0,
             dHeight: 0,
-            scale : 1
+            scale : 1,
         }
 
         this.settings = {
@@ -29,9 +33,13 @@ class ViewController {
 
         this.draw = this.draw.bind(this)
         this.zoom = this.zoom.bind(this)
+        this.load = this.load.bind(this)
+        this.help = this.help.bind(this)
         this.clear = this.clear.bind(this)
+        this.cache = this.cache.bind(this)
         this.attach = this.attach.bind(this)
         this.append = this.append.bind(this)
+        this.connect = this.connect.bind(this)
         this.project = this.project.bind(this)
         this.display = this.display.bind(this)
         this.onWheel = this.onWheel.bind(this)
@@ -51,7 +59,13 @@ class ViewController {
         this.canvas = canvas;
         this.context = canvas.getContext("2d")
         this.overlay = overlay;
+        this.background = overlay.querySelector(".background")
+        this.recenterBtn = overlay.querySelector(".controls .recenter")
         this.addEventListeners()
+    }
+
+    connect(notify){
+        this.notify = notify;
     }
 
     append(assets){
@@ -63,10 +77,27 @@ class ViewController {
 
     display(){
         if (this.image){
-            this.autoscale()
+            this.load()
             this.runQueue()
         }
     }
+
+    cache(){
+        if ((new Date().getTime() - this._cachetime) > 200){
+            saveObject("interactive-view-", {...this.view})
+            this._cachetime = new Date().getTime();
+        }
+    }
+
+    load(){
+        const view = getSavedObject("interactive-view-");
+        if (view.sWidth === this.image.width && view.sHeight === this.image.height){
+            this.view = view;
+        } else {
+            this.autoscale()
+        }
+    }
+
 
     runQueue(){
         this.queue.forEach(action=>action());
@@ -74,6 +105,8 @@ class ViewController {
         this.clear()
         this.draw()
         this.annotate()
+        this.help()
+        this.cache()
         this.frameId = window.requestAnimationFrame(this.runQueue)
     }
 
@@ -113,6 +146,10 @@ class ViewController {
         this.view.sy = 0;
         this.view.sWidth = this.image.width;
         this.view.sHeight = this.image.height;
+
+        this.view._auto_scale = this.view.scale;
+        this.view._auto_dx = this.view.dx;
+        this.view._auto_dy = this.view.dy;
     }
 
     clear(){
@@ -144,12 +181,18 @@ class ViewController {
     }
 
     addAnnotation(annotation){
+        const that = this;
+        console.log(that)
         const box = document.createElement("div");
+        box.className = 'box'
         box.innerHTML = "<div class='label'></div>"
-        this.overlay.appendChild(box)
+        this.overlay.prepend(box)
+        box.addEventListener("click", () => that.notify({_sync:false,type:"test"}))
         annotation.dom = box
         return annotation
     }
+
+
 
     editAnnotation(annotation){
         const {bbox, color, label, dom} = annotation;
@@ -169,19 +212,33 @@ class ViewController {
         }
     }
 
+    help(){
+        // Recenter
+        if (this.view._auto_scale === this.view.scale && 
+        this.view._auto_dx === this.view.dx &&
+        this.view._auto_dy === this.view.dy){
+            this.overlay.setAttribute("data-recenter-active",false);
+        }else {
+            this.overlay.setAttribute("data-recenter-active",true);
+        }
+    }
+
     addEventListeners(){
-        this.canvas.addEventListener("mousedown", this.onMouseDown)
-        this.canvas.addEventListener("wheel", this.onWheel)
+        this.background.addEventListener("mousedown", this.onMouseDown)
+        this.background.addEventListener("wheel", this.onWheel)
+        this.recenterBtn.addEventListener("click", this.autoscale)
     }
 
     removeEventListeners(){
-        this.canvas.removeEventListener("mousedown", this.onMouseDown)
-        this.canvas.removeEventListener("wheel", this.onWheel)
+        this.background.removeEventListener("mousedown", this.onMouseDown)
+        this.background.removeEventListener("wheel", this.onWheel)
+        this.recenterBtn.removeEventListener("click", this.autoscale)
     }
 
     onMouseDown(){
         window.addEventListener("mousemove",this.onMouseMove)
         window.addEventListener("mouseup", this.onMouseUp)
+        document.body.style.cursor = "grabbing";
     }
 
     onMouseMove({movementX, movementY}){
@@ -191,6 +248,7 @@ class ViewController {
     onMouseUp(){
         window.removeEventListener("mousemove", this.onMouseMove)
         window.removeEventListener("mouseup", this.onMouseUp)
+        document.body.style.cursor = "default"
     }
 
     onWheel({layerX, layerY, wheelDelta}){
