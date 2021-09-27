@@ -1,4 +1,3 @@
-import re, os
 from uuid import uuid4
 from tornado.web import HTTPError
 from os.path import isfile, join
@@ -14,50 +13,83 @@ from .constants import ROOT, UPLOAD_FOLDER, SEP_UID_NAME
 from . import tasks
 
 
-def add(session, file):
-    """Adds file to storage.
+def upload(session, file: object):
+    """Uploads file to storage.
 
     Args:
-        session :
-        file : object
-            File object
+        session
+        file 
+
+    Returns:
+        object
     """
     filename, body, content_type = file["filename"], file["body"], file["content_type"]
-    uid = uuid4().hex
-    fname = uid + SEP_UID_NAME + Path(filename).stem + Path(filename).suffix
-    uri = ROOT + UPLOAD_FOLDER + fname
+    if content_type == "zip":
+        return upload_zip(session, file)
 
-    # First add the pdf file to the storage folder, as we need it for the preprocessing
+    if content_type != "application/pdf":
+        return {
+            'status': "Wrong file type."
+        }
+    return upload_pdf(session, file)
+
+
+def upload_zip(session, file):
+    """Uploads zip
+    """
+    pass
+
+
+def upload_pdf(session, file):
+    """Uploads pdf
+    """
+    uid = uuid4().hex
+    filename, body, content_type = file["filename"], file["body"], file["content_type"]
+    fname = uid + SEP_UID_NAME + Path(filename).stem + Path(filename).suffix
+    pdf_uri = ROOT + UPLOAD_FOLDER + fname
+
     with open("application/" + UPLOAD_FOLDER + fname, 'wb') as f:
         f.write(body)
 
-    preproc_id = preprocess(uid, uri)
+    proc_extractxml_id = proc_extractxml(uid, pdf_uri)
 
     new_source = Source(uid=uid, filename=filename,
-                        uri=uri, preproc_id=preproc_id)
+                        pdf_uri=pdf_uri, proc_extractxml_id=proc_extractxml_id)
+
     session.add(new_source)
     session.commit()
 
     return {
-        'URI': uri,
-        'size': str(len(body) / 1e6) + "MB",
+        'pdf_uri': pdf_uri,
+        'size': str(round(len(body) / 1e6, 2)) + "MB",
         'filename': filename,
         'uid': uid
     }
 
-def add_anyfile(session, file):
+
+def proc_extractxml(uid, pdf_uri):
+    """Async preprocess pdf after upload.
+
+    Args:
+        uri : (str)
+    """
+    task = tasks.process_pdf.delay(uid, pdf_uri)
+    print("> Worker | Start: XML extraction task:", task.id)
+    return task.id
+
+
+def add_xml(session, uid: str, file: object):
     """Adds any file to storage, assigning a uid, saving it and adding to source table
 
     Args:
         session :
-        file : object
-            File object
+        uid : source unique identifier
+        file : file object
     """
     filename, body, content_type = file["filename"], file["body"], file["content_type"]
-    uid = uuid4().hex
     name = Path(filename).stem + Path(filename).suffix
     fname = uid + SEP_UID_NAME + name
-    uri = ROOT + UPLOAD_FOLDER + fname
+    xml_uri = ROOT + UPLOAD_FOLDER + fname
 
     # The saving of an xml tree is slightly different
     name_out = "application/" + UPLOAD_FOLDER + fname
@@ -69,23 +101,12 @@ def add_anyfile(session, file):
     else:
         with open(name_out, 'wb') as f:
             f.write(body)
+    print("> Storage | Save: XML file")
 
-    # TODO
-    print("TODO: don't undestand so far the use of this ID")
-    preproc_id = "dummy_id"
-    new_source = Source(uid=uid, filename=name,
-                        uri=uri, preproc_id=preproc_id)
-    session.add(new_source)
-    session.commit()
-
-def preprocess(uid, uri):
-    """Async preprocess file after upload.
-
-    Args:
-        uri : (str)
-    """
-    task = tasks.process_pdf.delay(uid, uri)
-    return task.id
+    update(session, uid, {
+        "xml_uri": xml_uri,
+        "proc_extractxml_status": "done"
+    })
 
 
 def update(session, uid, data):
@@ -98,6 +119,7 @@ def update(session, uid, data):
     """
     source = session.query(Source).filter_by(uid=uid)
     source.update(data)
+    session.commit()
 
 
 def get(path):

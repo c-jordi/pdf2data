@@ -14,18 +14,18 @@ from . import storage
 import xml.etree.ElementTree as ET
 
 from .utils_files import extract_xml, clean_xml, get_text_onefile, \
-                        convert_textlines_in_xml_tree, create_tmp, \
-                        info_from_uri
+    convert_textlines_in_xml_tree, create_tmp, \
+    info_from_uri
 from .constants import API_AUTH, TMP_FOLDER
 
-"""
+
 celery = Celery(__name__)
 celery.conf.broker_url = os.environ.get(
     "CELERY_BROKER_URL", "pyamqp://guest@localhost//")
 celery.conf.result_backend = os.environ.get("CELERY_RESULT_BACKEND", "rpc://")
-"""
 
-#@celery.task(name="process_pdf")
+
+@celery.task(name="process_pdf")
 def process_pdf(uid, uri):
     """Process file after upload.
 
@@ -38,7 +38,7 @@ def process_pdf(uid, uri):
     """
     # Get the file
     uid, name, suffix = info_from_uri(uri)
-    
+
     # We need to preload the file into a file, and then read from it to make
     # it seekable
     # https://stackoverflow.com/questions/58702442/wrap-an-io-bufferediobase-such-that-it-becomes-seek-able
@@ -54,10 +54,10 @@ def process_pdf(uid, uri):
     # font characteristics
     root_xml = convert_textlines_in_xml_tree(root_xml)
     xml_tree = ET.ElementTree(root_xml)
-    # 5. Saving tmp xml into file, to open it again as str, and then 
+    # 5. Saving tmp xml into file, to open it again as str, and then
     # allow it serialization
     uri_xml = create_tmp(name + '.xml')
-    xml_tree.write(uri_xml, encoding = 'utf-8')
+    xml_tree.write(uri_xml, encoding='utf-8')
     # 6. Reading the str from the xml file
     with open(uri_xml, 'r') as f:
         all_text = f.readlines()
@@ -66,18 +66,16 @@ def process_pdf(uid, uri):
     os.remove(uri_out)
     os.remove(uri_xml)
 
-    # Once obtained all the information from the pdf, we need to contact the handlers to 
+    # Once obtained all the information from the pdf, we need to contact the handlers to
     # stored the generated files, and add the files to the source table in the DB
 
     # Send the processed file
     # The pdf is added on the main one
-    dict_data = {"status": "processed", "uid": uid, "data": 
-                    {"filename": name + '.xml', "body": xml_dict, "content_type": "xml"}}
+    dict_data = {"status": "processed", "uid": uid, "data":
+                 {"filename": name + '.xml', "body": xml_dict, "content_type": "xml"}}
     data = json.dumps(dict_data).encode("utf-8")
-    req = request.Request("http://localhost:8888/tasks/save_file", data=data)
+    req = request.Request("http://localhost:8888/tasks/save_xml", data=data)
     req.add_header("Token", API_AUTH)
     request.urlopen(req)
     # Sending the request
     return {"status": True}
-
-
