@@ -9,7 +9,7 @@ valid_req = {
         'project_desc': {'value': 'Test desc'},
         'project_auth': {'value': 'Test author, Another Test'},
         'project_lvl': {'value': 'block'},
-        'project_src': {'value': [{'_status': 'uploaded', 'URI': 'http://test_url', 'filename': 'No_Service.mp3', 'uid': '459a7eb3'}],
+        'project_src': {'value': [{'_status': 'uploaded', 'pdf_uri': 'http://test_url', 'filename': 'No_Service.mp3', 'uid': '459a7eb3'}],
                         'project_labels': {'value': [{'text': 'Label a', 'color': '#3E7BE2', 'colortext': '#3E7BE2'}],
                                            '__valid': True}
                         },

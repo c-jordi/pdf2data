@@ -6,3 +6,6 @@ schema
 celery
 flower
 pdf2text
+xmltodict
+numpy
+pdfminer.six

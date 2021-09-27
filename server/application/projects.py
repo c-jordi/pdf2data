@@ -1,5 +1,6 @@
 from uuid import uuid4
 from .models import Casestudy, Project, Source, Label
+from .tasks import process_pdf
 
 
 def get_all(session):

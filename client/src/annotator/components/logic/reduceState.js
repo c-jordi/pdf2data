@@ -4,7 +4,7 @@ const reduceState = (state, action) => {
         case "redirect":
             return {...state, _redirect: true}
         default:
-            return {}
+            return {...state}
     }
 }
 

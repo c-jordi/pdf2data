@@ -11,15 +11,18 @@ from . import projects
 from . import storage
 from . import annotator
 
+
 class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.set_header("Access-Control-Allow-Headers", "X-Requested-With")
 
+
 class StatusHandler(BaseHandler):
     def get(self):
         return self.write("The server is running!")
+
 
 class ProjectHandler(SessionMixin, BaseHandler):
     def get(self):
@@ -58,7 +61,7 @@ class FileStorageHandler(SessionMixin, BaseHandler):
     def post(self):
         file = self.request.files["fileupload"][0]
         with self.make_session() as session:
-            self.write(storage.add(session, file))
+            self.write(storage.upload(session, file))
 
 
 class AnnotatorHandler(SessionMixin, tornado.websocket.WebSocketHandler):
@@ -87,22 +90,16 @@ class TaskHandler(SessionMixin, BaseHandler):
         token = self.request.headers.get("Token")
         if token != API_AUTH:
             return 401
-            
-        if task_name == "preproc":
-            data = json_decode(self.request.body)
-            with self.make_session() as session:
-                storage.update(session, data["uid"], {"preproc_ok": 1})
 
-        # Simply save file in storage endpoint
-        if task_name == "save_file":
+        # Simply save xml in storage endpoint
+        if task_name == "save_xml":
             data = json_decode(self.request.body)
-            file_info = {"filename": data["data"]["filename"], "body": data["data"]["body"], 
-                        "content_type" : data["data"]["content_type"]}
+            file_info = {"filename": data["data"]["filename"], "body": data["data"]["body"],
+                         "content_type": data["data"]["content_type"]}
             with self.make_session() as session:
-                storage.add_anyfile(session, file_info)
-            # TODO
-            print("TODO: add row Task is finished")
-            print("File saved!")
+                storage.add_xml(session, data['uid'], file_info)
+            print("XML file has been saved.")
+
 
 handlers = [
     (r"/", StatusHandler),

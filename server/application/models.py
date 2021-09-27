@@ -4,6 +4,7 @@ from sqlalchemy.orm.relationships import foreign
 from sqlalchemy.sql.expression import desc, true
 from sqlalchemy.sql.sqltypes import Boolean
 from tornado_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -18,6 +19,7 @@ class Project(db.Model):
     level = Column(String, nullable=False)
     sources = relationship("Source")
     casestudies = relationship("Casestudy")
+    init_date = Column(String)
 
     def __init__(self, name=None, uid="", description="No description", author="No author", level="page", sources=[]):
         self.name = name
@@ -26,6 +28,7 @@ class Project(db.Model):
         self.author = author
         self.level = level
         self.sources = sources
+        self.init_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
     def as_dict(self):
         data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -78,6 +81,7 @@ class Label(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+
 """
 File naming convention:
 uid: unique id generated with uuid4().hex
@@ -86,22 +90,26 @@ filename: original name of the file, and for newly created files, simplified
 uri: the localhost location of the file + uid + _ + filename
 """
 
+
 class Source(db.Model):
     __tablename__ = 'sources'
     id = Column(Integer, primary_key=True)
     uid = Column(String, unique=True)
-    filename = Column(String, nullable=False)
-    uri = Column(String, nullable=False, unique=True)
     project_id = Column(Integer, ForeignKey('projects.id'))
-    preproc_id = Column(String)
-    preproc_ok = Column(Integer, default=0)
+    filename = Column(String, nullable=False)
+    pdf_uri = Column(String, nullable=False, unique=True)
+    xml_uri = Column(String, unique=True)
+    proc_extractxml_id = Column(String)
+    proc_extractxml_status = Column(String)
+    init_date = Column(String)
 
-    def __init__(self, uid, filename, uri, project_id=None, preproc_id=None):
+    def __init__(self, uid, filename, pdf_uri, project_id=None, proc_extractxml_id=None):
         self.uid = uid
         self.filename = filename
-        self.uri = uri
-        self.project_id = None
-        self.preproc_id = preproc_id
+        self.project_id = project_id
+        self.pdf_uri = pdf_uri
+        self.proc_extractxml_id = proc_extractxml_id
+        self.init_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
     def __repr__(self):
         return f"<Source: {self.filename}>"
