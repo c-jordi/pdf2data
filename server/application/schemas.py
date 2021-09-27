@@ -24,7 +24,7 @@ project_req_schema = Schema({
         'project_src': {
             'value': And([{
                 '_status': str,
-                'URI': Regex(r'^https?:\/\/[^\s]*$'),
+                'pdf_uri': Regex(r'^https?:\/\/[^\s]*$'),
                 'filename': str,
                 'uid': Regex(r'[0-9a-f]*'),
                 Optional(str): str

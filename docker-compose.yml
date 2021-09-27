@@ -1,27 +1,29 @@
 version: "3.9"
 services:
-  # web:
+  # api:
   #   build:
   #     context: ./server
-  #     dockerfile: ./docker/web
-  #   container_name: web
+  #     dockerfile: Dockerfile
+  #   container_name: api
+  #   restart: always
   #   ports:
-  #     - "8888:8888"
+  #     - 8000:8000
   #   volumes:
-  #     - .:/server
-  #   depends_on:
-  #     - rabbitmq
+  #     - "./server:/usr/src/app"
+  # depends_on:
+  # - rabbitmq
 
   # worker:
   #   build:
   #     context: ./server
-  #     dockerfile: ./docker/worker
+  #     dockerfile: ./server/worker.Dockerfile
+  #   restart: on-failure
   #   container_name: worker
   #   volumes:
   #     - .:/server
-  #   depends_on:
-  #     - rabbitmq
-  #     - web
+  #   command: bash -c "celery -A application.tasks worker --loglevel=INFO"
+  #   #depends_on:
+  #   # - rabbitmq
 
   rabbitmq:
     image: "rabbitmq:3.9.5-management-alpine"
@@ -30,6 +32,5 @@ services:
       - "15672:15672"
     networks:
       - network
-
 networks:
   network: {}
