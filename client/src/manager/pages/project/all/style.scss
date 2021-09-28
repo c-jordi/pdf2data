@@ -10,3 +10,12 @@
 		flex-grow: 1;
 	}
 }
+
+.search {
+	.settings {
+		cursor: pointer;
+		&:hover {
+			color: $color-primary;
+		}
+	}
+}

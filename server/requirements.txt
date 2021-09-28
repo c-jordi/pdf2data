@@ -9,3 +9,5 @@ pdf2text
 xmltodict
 numpy
 pdfminer.six
+fuzzywuzzy
+python-Levenshtein

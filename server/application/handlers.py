@@ -10,6 +10,7 @@ from .schemas import SchemaError, project_req_schema
 from . import projects
 from . import storage
 from . import annotator
+from . import search
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -101,6 +102,17 @@ class TaskHandler(SessionMixin, BaseHandler):
             print("XML file has been saved.")
 
 
+class SearchHandler(SessionMixin, BaseHandler):
+    def post(self):
+        print("Receiving search request")
+        data = json_decode(self.request.body)
+        with self.make_session() as session:
+            results = search.run(session, data)
+        self.write({
+            "suggestions": results
+        })
+
+
 handlers = [
     (r"/", StatusHandler),
     (r"/upload", FileStorageHandler),
@@ -108,5 +120,6 @@ handlers = [
     (r"/projects", ProjectHandler),
     (r"/projects/(.*)", ProjectHandler),
     (r"/annotate", AnnotatorHandler),
-    (r"/tasks/([a-zA-Z_]*)", TaskHandler)
+    (r"/tasks/([a-zA-Z_]*)", TaskHandler),
+    (r"/search", SearchHandler)
 ]

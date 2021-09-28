@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 
 import "./style.scss";
 
@@ -34,36 +34,70 @@ const InputErrors = ({_validation = {}}) => {
 	</>
 }
 
-const InputSuggestions = ({options, onChange}) => {
+const ClickListener = ({callback}) => {
+	useEffect(()=>{
+		document.body.addEventListener("click", callback)
 
-	if (options.length === 0){
+		return () => {
+			document.body.removeEventListener("click", callback)
+		}
+	}, [callback])
+
+	return <div className="click-listener"></div>
+}
+
+const InputSuggestions = ({options, show, onChange, setFocused}) => {
+
+	const renderSuggestions = (sugs) => {
+		return sugs.map((sug, i) => <div className="input-suggestion" key={"sug-"+i} onClick={sug.action}>{sug.content}</div>)
+	}
+
+	const onBlur = (evt) => {
+		let match = false;
+		let node = evt.target;
+		if (!node) return;
+		while(!match){
+			if (node.className === "input-simple-container"){
+				match = true;
+			}
+			else if (node.className === "App"){
+				setFocused(false)
+				return;
+			}
+			else {
+				node = node.parentNode;
+				if (!node) return;
+			}
+		}		
+	}
+
+	if (options.length === 0 || !show){
 		return <div className="input-nosuggestions"/>
 	}
 
-	const handleClick = (sug) => {
-		return () => onChange({type:"overwrite", value:sug})
-	}
-
-	const renderSuggestions = (sugs) => {
-		return sugs.map((sug) => <div className="input-suggestion" key={sug} onClick={handleClick(sug)}>{sug}</div>)
-	}
-
 	return <div className="input-suggestions">
+		<ClickListener callback={onBlur}></ClickListener>
 		{renderSuggestions(options)}
 	</div>
 
 }
 
-const SimpleInput = ({ value, onChange, placeholder, isExtended, required}) => {
+
+const SimpleInput = ({ value, onChange, setFocused, placeholder, isExtended, required}) => {
 
 	const handleChange = (evt) => {
 		onChange({type:"overwrite", value: evt.target.value})
+	}
+
+	const onFocus = ()=>{
+		setFocused(true)
 	}
 
 	const properties = {
 		placeholder,
 		type : "text",
 		value,
+		onFocus,
 		onChange: handleChange,
 		className : "input-simple",
 		required,
@@ -80,47 +114,32 @@ const SimpleInput = ({ value, onChange, placeholder, isExtended, required}) => {
 
 
 const InputContainer = (props) => {
-
-	const isExtended = props.suggestions.length > 0;
-
+	const isExtended = props.options.length > 0;
+	const [isFocused, setFocused] = useState(false);
+	
 	return (
 		<div className="input-simple-container">
-			<SimpleInput isExtended={isExtended} {...props}></SimpleInput> 
-			<InputSuggestions {...props}></InputSuggestions>
+			<SimpleInput setFocused={setFocused} isExtended={isExtended && isFocused} {...props}></SimpleInput> 
+			<InputSuggestions show={isExtended && isFocused} setFocused={setFocused} {...props}></InputSuggestions>
 			<InputErrors {...props}></InputErrors>
 		</div>	
 	);
 };
 
 InputContainer.propTypes = {
-	suggestions : PropTypes.arrayOf(PropTypes.string),
-}
-
-InputContainer.defaultProps = {
-	suggestions : []
-}
-
-InputSuggestions.propTypes = {
-	options : PropTypes.arrayOf(PropTypes.string),
-}
-
-InputSuggestions.defaultProps = {
-	options : [],
-}
-
-SimpleInput.propTypes = {
+	options : PropTypes.oneOf([PropTypes.arrayOf(PropTypes.object), []]),
 	value : PropTypes.string.isRequired,
 	onChange : PropTypes.func.isRequired,
 	placeholder: PropTypes.string,
 	required: PropTypes.bool,
 	isExtended: PropTypes.bool
-};
+}
 
-SimpleInput.defaultProps = {
-	placeholder: "",
-	required: false,
+InputContainer.defaultProps = {
+	options : [],
+	placeholder : "",
+	required : false,
 	isExtended : false
-};
-
+}
 
 export default InputContainer;

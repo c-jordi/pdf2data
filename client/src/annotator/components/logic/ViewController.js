@@ -182,7 +182,6 @@ class ViewController {
 
     addAnnotation(annotation){
         const that = this;
-        console.log(that)
         const box = document.createElement("div");
         box.className = 'box'
         box.innerHTML = "<div class='label'></div>"
