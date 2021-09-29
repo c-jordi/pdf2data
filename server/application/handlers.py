@@ -115,7 +115,7 @@ class TaskHandler(SessionMixin, BaseHandler):
                 storage.add_xml(session, data['uid'], file_info)
             print("XML file has been saved.")
 
-        if task_name == "extract_featues":
+        if task_name == "extract_features":
             # TODO: when calling this, we need to provide also the project_id where we are working now
             data = json_decode(self.request.body)
             project_id = data["project_id"]
@@ -124,6 +124,7 @@ class TaskHandler(SessionMixin, BaseHandler):
             print("Features extracted from all files.")
 
         if task_name == "save_features":
+            # TODO
             data = json_decode(self.request.body)
             file_info = {"filename": data["data"]["filename"], "body": data["data"]["body"],
                          "content_type": data["data"]["content_type"]}
