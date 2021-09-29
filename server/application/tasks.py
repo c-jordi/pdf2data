@@ -105,6 +105,11 @@ def extract_features(uid, xml_uri, parser_type):
     # The dataframe is returned, and then, we send it back to the server, that will
     # store it in the DBs
     return features_file
+
+    # TODO: here we are just sending for the moment the dataframe, as I was testing this
+    # but this function needs to call the handler tasks/save_features, send the dataframe,
+    # and this will store this in the DB table Features
+
     """
     dict_data = {"status": "processed", "uid": uid, "data":
                  {"filename": name, "body": features_file, "content_type": "pandas"}}
