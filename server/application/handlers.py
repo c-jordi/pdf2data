@@ -9,6 +9,7 @@ from .constants import API_PREFIX, UPLOAD_FOLDER, API_AUTH
 from .schemas import SchemaError, project_req_schema, project_upd_schema
 from . import projects
 from . import storage
+from . import feat_extract
 from . import annotator
 from . import search
 
@@ -113,6 +114,22 @@ class TaskHandler(SessionMixin, BaseHandler):
             with self.make_session() as session:
                 storage.add_xml(session, data['uid'], file_info)
             print("XML file has been saved.")
+
+        if task_name == "extract_featues":
+            # TODO: when calling this, we need to provide also the project_id where we are working now
+            data = json_decode(self.request.body)
+            project_id = data["project_id"]
+            with self.make_session() as session:
+                feat_extract.extract_features(session, project_id)
+            print("Features extracted from all files.")
+
+        if task_name == "save_features":
+            data = json_decode(self.request.body)
+            file_info = {"filename": data["data"]["filename"], "body": data["data"]["body"],
+                         "content_type": data["data"]["content_type"]}
+            with self.make_session() as session:
+                feat_extract.save_features(session, file_info)
+            print("Features saved in the DB table.")
 
 
 class SearchHandler(SessionMixin, BaseHandler):
