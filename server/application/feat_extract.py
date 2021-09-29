@@ -26,9 +26,9 @@ def extract_features(session, project_id):
     feature_level = project_data["level"]
 
     for source in all_source:
-        proc_extr_feat(all_source["uid"], all_source["xml_uri"], feature_level)
+        proc_extr_feat(source["uid"], source["xml_uri"], feature_level)
 
-    
+
 
     """
     new_source = Source(uid=uid, filename=filename,
