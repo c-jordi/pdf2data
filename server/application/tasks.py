@@ -16,6 +16,8 @@ import xml.etree.ElementTree as ET
 from .utils_files import extract_xml, clean_xml, get_text_onefile, \
     convert_textlines_in_xml_tree, create_tmp, \
     info_from_uri
+
+from application.features import feature_parsing
 from .constants import API_AUTH, TMP_FOLDER
 
 
@@ -79,3 +81,38 @@ def process_pdf(uid, uri):
     request.urlopen(req)
     # Sending the request
     return {"status": True}
+
+#@celery.task(name="extract_features")
+def extract_features(uid, xml_uri, parser_type):
+    """
+    This task is trigerred once the project is created, i.e., when we 
+    know the level of the features. Besides, it is triggered again when
+    some changes are done on the features menu, or when new files are added
+    """
+
+    # Get the file
+    _, name, suffix = info_from_uri(xml_uri)
+
+    # Now, we call the function that parse the document and obtain the features
+    parser_name = "textblock_type"
+    if parser_type == "textline":
+        parser_name = "textline_type"
+    elif parser_type == "page":
+        parser_name = "page_type"
+    doc_parser = feature_parsing.get_available_parsers()[parser_name]
+    features_file = feature_parsing.extract_features_for_file(doc_parser, xml_uri)
+
+    # The dataframe is returned, and then, we send it back to the server, that will
+    # store it in the DBs
+    return features_file
+    """
+    dict_data = {"status": "processed", "uid": uid, "data":
+                 {"filename": name, "body": features_file, "content_type": "pandas"}}
+    data = json.dumps(dict_data).encode("utf-8")
+    req = request.Request("http://localhost:8888/tasks/save_features", data=data)
+    req.add_header("Token", API_AUTH)
+    request.urlopen(req)
+    # Sending the request
+    return {"status": True}
+    """
+
