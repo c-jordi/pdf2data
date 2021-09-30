@@ -7,7 +7,7 @@ const defaultStyling = {
 }
 
 
-const NavHorizontal = ({name,menu,persist,styling }) => {
+const NavHorizontal = ({name,menu,persist,styling,className}) => {
 
     const _styling = {...defaultStyling, ...styling};
 
@@ -32,7 +32,7 @@ const NavHorizontal = ({name,menu,persist,styling }) => {
         })
     }
 
-    return <div className="nav-horizontal">
+    return <div className={"nav-horizontal " + className}>
         <div className="menu">
             {generateMenu()}
         </div> 
@@ -43,7 +43,8 @@ NavHorizontal.propTypes = {
 	name: PropTypes.string.isRequired,
     menu : PropTypes.arrayOf(PropTypes.object),
     persist : PropTypes.bool,
-    styling : PropTypes.object
+    styling : PropTypes.object,
+    className : PropTypes.string
 };
 
 NavHorizontal.defaultProps = {
@@ -52,7 +53,8 @@ NavHorizontal.defaultProps = {
         {label:"Other",action:()=>{}}
     ],
     persist : false,
-    styling : {}
+    styling : {},
+    className : ''
 };
 
 export default NavHorizontal

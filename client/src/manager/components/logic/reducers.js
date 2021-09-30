@@ -21,17 +21,17 @@ export function reduceState(state, el){
     switch (el.type){
         case "simple":
         case "multi":
-            return {...state, [el.name] : {value : "", ...meta}, _names:[..._names, el.name]}
+            return {...state, [el.name] : {value : (el.value? el.value:""), ...meta}, _names:[..._names, el.name]}
         case "list":
-            return {...state, [el.name] : {value : [""], ...meta}, _names:[..._names, el.name]}
+            return {...state, [el.name] : {value : (el.value? el.value:[""]), ...meta}, _names:[..._names, el.name]}
         case "filelist":
-            return {...state, [el.name] : {value : [{_status:"empty"}], ...meta}, _names:[..._names, el.name]}
+            return {...state, [el.name] : {value : (el.value? el.value:[{_status:"empty"}]), ...meta}, _names:[..._names, el.name]}
         case "labellist":
-            return {...state, [el.name] : {value : [{_status:"empty", text:"", color:"#3E7BE2", colortext: "#3E7BE2"}], ...meta}, _names:[..._names, el.name]}
+            return {...state, [el.name] : {value : (el.value? el.value:[{_status:"empty", text:"", color:"#3E7BE2", colortext: "#3E7BE2"}]), ...meta}, _names:[..._names, el.name]}
         case "radio":
-            return {...state, [el.name] : {options: el.options, value:el.options[0].value, ...meta}, _names:[..._names, el.name]}
+            return {...state, [el.name] : {options: el.options, value:(el.value? el.value:el.options[0].value), ...meta}, _names:[..._names, el.name]}
         case "checkbox":
-            return {...state, [el.name] : {options: el.options, value:{}, ...meta}, _names:[..._names, el.name]}
+            return {...state, [el.name] : {options: el.options, value:(el.value? el.value:{}), ...meta}, _names:[..._names, el.name]}
         case "section":
             return el.content.reduce(reduceState, state)
         default:

@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import CreateProject from "./manager/pages/project/create";
 import AllProjects from "./manager/pages/project/all";
+import EditProject from "./manager/pages/project/edit"
 import Annotator from "./annotator/page";
 import "./App.scss";
 
@@ -19,6 +20,7 @@ function App() {
 						<AllProjects></AllProjects>
 					</Route>
 					<Route path="/annotate/:uid" component={Annotator}/>
+					<Route path="/project/:uid" component={EditProject}/>
 					<Route path="/">
 						<CreateProject></CreateProject>
 					</Route>

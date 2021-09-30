@@ -6,33 +6,33 @@ import PropTypes from "prop-types"
 import FormUpload from "./FormUpload";
 
 export default class FormHandler extends Component {
+
     constructor(props){
         super(props);     
         
         this.state = this.verify(this.createState())
         
-        this.formCallback = this.formCallback.bind(this)
         this.prefix = this.props.params.name + '-';
-        this.loadSavedState = this.loadSavedState.bind(this)
+        this.sendForm = this.sendForm.bind(this)
+        this.formCallback = this.formCallback.bind(this)
         this.autosaveState = this.autosaveState.bind(this)
-        this.clearSavedState = this.clearSavedState.bind(this)
-        this.sendForm = this.sendForm.bind(this)   
         this.onFormSuccess =  this.onFormSuccess.bind(this)
+        this.loadSavedState = this.loadSavedState.bind(this)
+        this.clearSavedState = this.clearSavedState.bind(this)
+          
     }
 
     createState(){
-        const newState = this.props.content.reduce(reduceState, {_names : []});
+        const newState = this.props.content.reduce(reduceState, {_names : [], __meta: this.props.meta});
         if (this.props.params.autosave){
             const cachedState = this.loadSavedState(this.props.params.name)
             return {...newState,...cachedState};
         }
-        return newState
+        return {...newState, ...this.props.state}
     }
 
     verify(state){
-        const temp = validateState(state)
-        console.log(temp)
-        return temp
+        return validateState(state)
     }
 
     runMethod({origin,action}){
@@ -49,7 +49,6 @@ export default class FormHandler extends Component {
         this.setState({})
     }
 
-
     sendForm(){
         this.clearSavedState()
         new FormUpload(this.props.params, this.state, this.onFormSuccess).run()
@@ -58,6 +57,7 @@ export default class FormHandler extends Component {
     loadSavedState(){
         return getSavedObject(this.props.params.name + '-');
     }
+
 
     autosaveState(){
         saveObject(this.prefix, this.state)
@@ -87,7 +87,7 @@ export default class FormHandler extends Component {
         if (this._redirect){
             return <Redirect to={this.props.params.redirect}></Redirect>
         }
-        this.autosaveState()
+        if (this.props.params.autosave) this.autosaveState()
         return <div className="form-logic" >{this.renderContent()}</div>
     }
     
@@ -98,17 +98,21 @@ FormHandler.propTypes = {
         name : PropTypes.string.isRequired,
         autosave : PropTypes.bool,
         endpoint : PropTypes.string.isRequired,
-        redirect : PropTypes.string
+        redirect : PropTypes.string,
+        meta : PropTypes.object
     }),
-    content : PropTypes.array.isRequired
+    content : PropTypes.array.isRequired,
+    state : PropTypes.object
 }
 
 FormHandler.defaultProps = {
     params : {
         name : "default-form",
-        autosave : true,
+        autosave : false,
         endpoint : '',
-        redirect : ''
+        redirect : '',
+        meta : {}
     },
-    content : []
+    content : [],
+    state : {}
 }

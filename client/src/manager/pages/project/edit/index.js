@@ -1,55 +1,62 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Header from "./Header"
-import {Container, Section} from "../../../components/views";
+import Overview from "./Overview"
+import Settings from "./Settings"
+import {Redirect} from 'react-router-dom'
+import {Container} from "../../../components/views";
+import { NavPanel} from "../../../components/navs"
 import Sidebar from "../../../parts/Sidebar"
-import FormHandler from "../../../parts/Form";
-import {BiAlignJustify, BiMenu, BiText} from "react-icons/bi"
 import "./style.scss";
 
 
-const formParams = {
-	name : "new-project-form",
-	autosave : false,
-	endpoint : "http://localhost:8888/projects/new",
-	redirect : "/projects"
-}
+const EditProject = (props) => {
 
-const formContent = [
-	{type:"title", content: "Project settings"},
-	{type:"section", header: "Name",caption:"Helpful to quickly find your project", content:[
-		{type:"simple", name: "project_name", placeholder:"Enter a name", validation: "string.string>5.string<50"},
-	]},
-	{type:"section", header: "Description", caption: "Describe your project in a couple words", content:[
-		{type:"multi", name: "project_desc", placeholder:"Enter a description"}
-	]},
-	{type:"section", header: "Author", caption: "If multiple, seperate names with comma", content:[
-		{type:"simple", name: "project_auth", placeholder:"Enter author name(s)", validation: "string.string>3.letters&commas"}
-	]},
-	{type:"title", content:"Experiment definition"},
-	{type:"section", header: "Document level", caption: "Once the project has been created, you will not be able to change the document level.", content:[
-		{type: "radio", name:"project_lvl", options:[
-			{label:<React.Fragment><BiAlignJustify/><span>Page</span></React.Fragment>,value:"page"},
-			{label:<React.Fragment><BiMenu/><span>Block</span></React.Fragment>, value:"block"},
-			{label:<React.Fragment><BiText/><span>Textline</span></React.Fragment>, value:"textline"}
-		]}
-	]},
-	{type:"section", header: "Source folders", caption:"Select the folders containing the data you would like to use in the experiment.", content:[
-		{type:"filelist", name:"project_src", validation:"oneuploadmin"}
-	]},
-	{type:"section", header: "Labels", caption: "Enter the labels that will be used in the classification", content:[
-		{type:"labellist", name:"project_labels", validation: "validlabelcolor.validlabeltext.uniquelabelcolor.uniquelabeltext"}
-	]},
-	{type:"submit", name: "submit_btn", label:"Create project", action: {type:"send"}}
-]
+    const {uid} = props.match.params;
+    const [state, setState] = useState({_loading:true});
 
 
-const EditProject = () => {
+    const fetchProject = async () => {
+        const resp = await fetch(`http://localhost:8888/projects/${uid}`, {
+            method: "get",
+            headers: {
+                'Origin': 'http://localhost:2000',
+                'Access-Control-Request-Headers': 'Origin, Accept, Content-Type',
+                'Access-Control-Request-Method': 'GET'
+            }
+        })
+        const result = await resp.json()
+        setState({...state, result, _loading:false})
+    }
+
+    useEffect(()=>{
+        if (state._loading) fetchProject()
+    },)
+
+    if (state._loading){
+        return <>
+			<Sidebar active={"/project/edit"}></Sidebar>
+			<Container>
+                Loading..
+			</Container>
+		</>
+    }
+
+    if (state._invalid){
+        return <Redirect to={"/projects"}></Redirect>
+    }
+
+    const panels = [
+        {label: "Overview", content : <Overview state={state.result}/>},
+        {label: "Settings", content: <Settings state={state.result}/>}
+    ]
+    
+
 	return (
 		<>
 			<Sidebar active={"/project/edit"}></Sidebar>
 			<Container>
-                <Header></Header>
-				<FormHandler params={formParams} content={formContent}></FormHandler>
+                <Header state={state.result}></Header>
+                <NavPanel panels={panels}></NavPanel>
 			</Container>
 		</>
 	);

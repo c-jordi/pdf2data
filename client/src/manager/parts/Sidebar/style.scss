@@ -6,7 +6,7 @@
 	padding-left: 40px;
 	border-right: 1px solid $color-highlight;
 
-	&__header {
+	.header {
 		@extend .text-headline;
 	}
 
@@ -16,7 +16,7 @@
 		position: sticky;
 		top: 0;
 
-		&__header {
+		& .header {
 			@extend .text-caption;
 			text-transform: uppercase;
 			color: $color-highlight;
@@ -24,14 +24,14 @@
 			margin-bottom: 5px;
 		}
 
-		&__item {
+		& .item {
 			@extend .text-body;
 			margin-top: 10px;
 			margin-bottom: 10px;
 			cursor: pointer;
 		}
 
-		&__item:hover {
+		& .item:hover {
 			border-right: 4px solid $color-primary;
 			color: $color-primary;
 		}

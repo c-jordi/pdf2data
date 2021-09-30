@@ -14,8 +14,15 @@
 .search {
 	.settings {
 		cursor: pointer;
+		display: none;
 		&:hover {
 			color: $color-primary;
 		}
 	}
+
+	.input-suggestion:hover .settings {
+		display: block;
+	}
+	margin-top: 0.5rem;
+	margin-bottom: 2rem;
 }

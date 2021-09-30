@@ -11,7 +11,8 @@ class FormUpload {
 
         const postObj = {
             name : this.params.name,
-            data : this.state
+            data : this.state,
+            meta : this.params.meta
         }
 
         const res = await axios.post(this.params.endpoint, postObj, {

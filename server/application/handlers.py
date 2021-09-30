@@ -6,7 +6,7 @@ from tornado_sqlalchemy import SessionMixin
 
 from .models import db, Project
 from .constants import API_PREFIX, UPLOAD_FOLDER, API_AUTH
-from .schemas import SchemaError, project_req_schema
+from .schemas import SchemaError, project_req_schema, project_upd_schema
 from . import projects
 from . import storage
 from . import annotator
@@ -26,13 +26,18 @@ class StatusHandler(BaseHandler):
 
 
 class ProjectHandler(SessionMixin, BaseHandler):
-    def get(self):
+    def get(self, uid=''):
         with self.make_session() as session:
-            self.write({
-                "results": projects.get_all(session)
-            })
+            if uid == '':
+                self.write({
+                    "results": projects.get_all(session)
+                })
+            else:
+                self.write(projects.get(session, uid))
 
     async def post(self, action):
+        if action == "update":
+            return self.update_project()
         if action == "new":
             return self.new_project()
         if action == "check":
@@ -45,6 +50,15 @@ class ProjectHandler(SessionMixin, BaseHandler):
             project_req_schema.validate(req)
             with self.make_session() as session:
                 projects.add(session, req)
+        except SchemaError as e:
+            raise e
+
+    def update_project(self):
+        req = json_decode(self.request.body)
+        try:
+            project_upd_schema.validate(req)
+            with self.make_session() as session:
+                projects.update(session, req)
         except SchemaError as e:
             raise e
 
@@ -87,7 +101,6 @@ class AnnotatorHandler(SessionMixin, tornado.websocket.WebSocketHandler):
 
 class TaskHandler(SessionMixin, BaseHandler):
     def post(self, task_name):
-        print("Receiving post request")
         token = self.request.headers.get("Token")
         if token != API_AUTH:
             return 401
@@ -104,7 +117,16 @@ class TaskHandler(SessionMixin, BaseHandler):
 
 class SearchHandler(SessionMixin, BaseHandler):
     def post(self):
-        print("Receiving search request")
+        data = json_decode(self.request.body)
+        with self.make_session() as session:
+            results = search.run(session, data)
+        self.write({
+            "suggestions": results
+        })
+
+
+class SyncHandler(SessionMixin, BaseHandler):
+    def post(self, level, uid):
         data = json_decode(self.request.body)
         with self.make_session() as session:
             results = search.run(session, data)
@@ -117,9 +139,9 @@ handlers = [
     (r"/", StatusHandler),
     (r"/upload", FileStorageHandler),
     (r"/storage/(.*)", FileStorageHandler),
-    (r"/projects", ProjectHandler),
     (r"/projects/(.*)", ProjectHandler),
+    (r"/projects", ProjectHandler),
     (r"/annotate", AnnotatorHandler),
     (r"/tasks/([a-zA-Z_]*)", TaskHandler),
-    (r"/search", SearchHandler)
+    (r"/search", SearchHandler),
 ]

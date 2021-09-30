@@ -9,6 +9,15 @@ def get_all(session):
     return [project.as_dict() for project in session.query(Project).all()]
 
 
+def get(session, uid):
+    """Returns the project data for a uid
+    """
+    project = session.query(Project).filter_by(uid=uid).first()
+    if project:
+        return project.as_dict()
+    return {"_invalid": True}
+
+
 def add(session, req):
     """Adds a project to the database.
 
@@ -36,6 +45,22 @@ def add(session, req):
         label.casestudy_id = new_case.id
     session.commit()
     return "ok"
+
+
+def update(session, req):
+    """Updates an existing project
+
+    Args:
+        session
+        req
+    """
+    project = session.query(Project).filter_by(
+        uid=req["meta"].get("uid", "")).first()
+    if project:
+        project.name = req["data"]["project_name"]["value"]
+        project.description = req["data"]["project_desc"]["value"]
+        project.author = req["data"]["project_auth"]["value"]
+        session.commit()
 
 
 def create_new_project(req):

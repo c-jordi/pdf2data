@@ -1,7 +1,7 @@
 import React, {useReducer} from "react"
 import {TickInput} from "../../inputs"
 import { Redirect } from 'react-router-dom'
-import {BiAlignJustify, BiMenu, BiText } from "react-icons/bi";
+import {BiAlignJustify, BiMenu, BiText, BiCog } from "react-icons/bi";
 import "./style.scss"
 
 const LevelIcon = (props) => {
@@ -24,22 +24,26 @@ const Label = (props) => {
 const ItemParent = ({data}) => {
 
     const reducer = (state, action) => {
-        switch (action){
-            case "toggle":
-                return !state;
+        switch (action.type){
+            case "redirect":
+                return {...state, redirect:action.value};
             default:
                 return state
         }
     }
 
-	const [isToggled, dispatch] = useReducer(reducer, true);
+	const [state, dispatch] = useReducer(reducer, {});
 
     const handleClick = () => {
-        dispatch("toggle")
+        dispatch({type:"redirect", value:`/annotate/${data.uid}`})
+    }
+
+    const handleCogClick = () => {
+        dispatch({type:"redirect", value:`/project/${data.uid}`})
     }
 
     const hideLongText = (text, maxLength) => {
-        if (text.length >= maxLength){
+        if (text.length > maxLength){
             return text.slice(0, maxLength) + "..."
         }
         return text
@@ -48,9 +52,9 @@ const ItemParent = ({data}) => {
     const renderLabels = (labels) => {
         return labels.map((label,i)=> <Label {...label} key={i}></Label>)
     }
-    console.log(data)
-    if (!isToggled){
-        return <Redirect to={`/annotate/${data.uid}`}></Redirect>
+
+    if (state.redirect){
+        return <Redirect to={state.redirect}></Redirect>
     }
 
 
@@ -68,8 +72,11 @@ const ItemParent = ({data}) => {
             <div className="author">
                 {data.author}
             </div>
+            <div className="settings">
+                <BiCog onClick={handleCogClick}></BiCog>
+            </div>
         </div>
-        <div className="item-body" data-hidden={isToggled}>{}</div>
+        {/* <div className="item-body" data-hidden={state.toggled}>{}</div> */}
     </div>
 }
 

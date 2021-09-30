@@ -44,3 +44,26 @@ project_req_schema = Schema({
         Optional(Regex(r"^__.*")): Or(bool, str),
     }
 })
+
+project_upd_schema = Schema({
+    'name': 'project-edit-form',
+    'data': {
+        'project_name': {
+            'value': And(str, lambda x: len(x) > 5),
+            Optional(str): Or(str, object)
+        },
+        'project_desc': {
+            'value': str,
+            Optional(str): Or(str, object)
+        },
+        'project_auth': {
+            'value': And(str, lambda x: len(x) > 3, Regex(r'^[a-xA-Z\s,]+$')),
+            Optional(str): Or(str, object)
+        },
+        '_names': list,
+        Optional(Regex(r"^__.*")): Or(bool, str),
+    },
+    'meta': {
+        'uid': str
+    }
+})

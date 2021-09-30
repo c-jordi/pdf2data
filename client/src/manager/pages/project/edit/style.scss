@@ -1,0 +1,52 @@
+@import "../../../assets/scss/main.scss";
+
+.project-header {
+	display: flex;
+	flex-direction: row;
+	margin: 1rem 0;
+	align-items: center;
+	margin-bottom: 20px;
+
+	.left {
+		display: flex;
+		margin-left: 15px;
+		margin-right: 20px;
+		svg {
+			height: 2rem;
+			width: 1.5rem;
+			margin: auto;
+			cursor: pointer;
+
+			&:hover {
+				color: $color-primary;
+			}
+		}
+	}
+
+	.center {
+		flex-grow: 1;
+		.top {
+			margin-bottom: 10px;
+			.name {
+				font-size: 36px;
+				font-weight: bold;
+			}
+		}
+
+		.bottom {
+			display: flex;
+			flex-direction: row;
+			font-size: 16px;
+			.description {
+				margin-right: 20px;
+			}
+			.author {
+				color: $color-caption;
+			}
+		}
+	}
+}
+
+.edit-nav {
+	border-bottom: 1px solid $color-highlight;
+}

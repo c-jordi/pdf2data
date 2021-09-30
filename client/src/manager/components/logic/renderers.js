@@ -14,7 +14,7 @@ export function renderElement(el, state, formCallback){
             break;
     }
 
-    // Stateful components
+    // Stateful componentss
     const value = (el.name && state[el.name] ? state[el.name].value : undefined);
     const onChange = (action) => {formCallback({origin:el,action})}
     switch(el.type){
