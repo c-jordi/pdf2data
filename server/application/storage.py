@@ -51,10 +51,10 @@ def upload_pdf(session, file):
     with open("application/" + UPLOAD_FOLDER + fname, 'wb') as f:
         f.write(body)
 
-    proc_extractxml_id = proc_extractxml(uid, pdf_uri)
+    # proc_extractxml_id = proc_extractxml(uid, pdf_uri)  # Begin the extraction of the xml
 
     new_source = Source(uid=uid, filename=filename,
-                        pdf_uri=pdf_uri, proc_extractxml_id=proc_extractxml_id)
+                        pdf_uri=pdf_uri)
 
     session.add(new_source)
     session.commit()
@@ -65,17 +65,6 @@ def upload_pdf(session, file):
         'filename': filename,
         'uid': uid
     }
-
-
-def proc_extractxml(uid, pdf_uri):
-    """Async preprocess pdf after upload.
-
-    Args:
-        uri : (str)
-    """
-    task = tasks.process_pdf.delay(uid, pdf_uri)
-    print("> Worker | Start: XML extraction task:", task.id)
-    return task.id
 
 
 def add_xml(session, uid: str, file: object):
@@ -102,6 +91,7 @@ def add_xml(session, uid: str, file: object):
         with open(name_out, 'wb') as f:
             f.write(body)
     print("> Storage | Save: XML file")
+    print("Saved at:", name_out)
 
     update(session, uid, {
         "xml_uri": xml_uri,
@@ -129,6 +119,7 @@ def get(path):
         (content_type, binary_data)
     """
     file_location = join("application/"+UPLOAD_FOLDER, path)
+    print("file location:", file_location)
     if not isfile(file_location):
         raise HTTPError(status_code=404)
     content_type, _ = guess_type(file_location)

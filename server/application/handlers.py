@@ -69,6 +69,7 @@ class ProjectHandler(SessionMixin, BaseHandler):
 
 class FileStorageHandler(SessionMixin, BaseHandler):
     def get(self, path):
+        print("path:", path)
         with self.make_session() as session:
             content_type, binary_data = storage.get(path)
         self.add_header('Content-Type', content_type)

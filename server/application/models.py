@@ -20,6 +20,7 @@ class Project(db.Model):
     sources = relationship("Source")
     casestudies = relationship("Casestudy")
     init_date = Column(String)
+    preproc_id = Column(String)
 
     def __init__(self, name=None, uid="", description="No description", author="No author", level="page", sources=[]):
         self.name = name
@@ -146,6 +147,7 @@ class Annotation(db.Model):
     time_labelling = Column(String)
     user_labelling = Column(String)
     split = Column(String)
+
 
 class Feature(db.Model):
     __tablename__ = 'features'

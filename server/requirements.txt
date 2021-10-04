@@ -11,3 +11,6 @@ numpy
 pdfminer.six
 fuzzywuzzy
 python-Levenshtein
+pandas
+sklearn
+nltk

@@ -1,6 +1,8 @@
 from uuid import uuid4
+from celery import group
+
 from .models import Casestudy, Project, Source, Label
-from .tasks import process_pdf
+from . import tasks
 
 
 def get_all(session):
@@ -43,8 +45,24 @@ def add(session, req):
     for label in labels:
         new_case.labels.append(label)
         label.casestudy_id = new_case.id
+    new_project.preproc_id = preprocess(new_project)
     session.commit()
+
     return "ok"
+
+
+def preprocess(new_project):
+    """Async preprocess pdf after upload.
+
+    Args:
+        new_project 
+    """
+    feature_level = new_project.level
+    header = [tasks.process_pdf.s(s.uid, s.pdf_uri) | tasks.extract_features.s(feature_level)
+              for s in new_project.sources]
+    task = group(header).delay()
+
+    return task.id
 
 
 def update(session, req):

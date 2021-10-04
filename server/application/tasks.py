@@ -7,6 +7,7 @@ import json
 from urllib import request, parse
 from pathlib import Path
 from celery import Celery
+from celery.result import AsyncResult
 
 import xmltodict
 
@@ -18,7 +19,7 @@ from .utils_files import extract_xml, clean_xml, get_text_onefile, \
     info_from_uri
 
 from application.features import feature_parsing
-from .constants import API_AUTH, TMP_FOLDER
+from .constants import API_AUTH, TMP_FOLDER, ROOT, UPLOAD_FOLDER
 
 
 celery = Celery(__name__)
@@ -38,6 +39,7 @@ def process_pdf(uid, uri):
     Returns:
         (object) : Status info
     """
+    print("UID:", uid, "URI", uri)
     # Get the file
     uid, name, suffix = info_from_uri(uri)
 
@@ -58,15 +60,15 @@ def process_pdf(uid, uri):
     xml_tree = ET.ElementTree(root_xml)
     # 5. Saving tmp xml into file, to open it again as str, and then
     # allow it serialization
-    uri_xml = create_tmp(name + '.xml')
-    xml_tree.write(uri_xml, encoding='utf-8')
+    xml_uri_tmp = create_tmp(name + '.xml')
+    xml_tree.write(xml_uri_tmp, encoding='utf-8')
     # 6. Reading the str from the xml file
-    with open(uri_xml, 'r') as f:
+    with open(xml_uri_tmp, 'r') as f:
         all_text = f.readlines()
     xml_dict = xmltodict.parse('\n'.join(all_text))
     # 7. Removing all tmp created
     os.remove(uri_out)
-    os.remove(uri_xml)
+    os.remove(xml_uri_tmp)
 
     # Once obtained all the information from the pdf, we need to contact the handlers to
     # stored the generated files, and add the files to the source table in the DB
@@ -79,18 +81,23 @@ def process_pdf(uid, uri):
     req = request.Request("http://localhost:8888/tasks/save_xml", data=data)
     req.add_header("Token", API_AUTH)
     request.urlopen(req)
-    # Sending the request
-    return {"status": True}
 
-#@celery.task(name="extract_features")
-def extract_features(uid, xml_uri, parser_type):
+    # Replace with the uri contained in the server response
+    xml_uri = uri.replace(".pdf", ".xml")
+
+    return uid, xml_uri
+
+
+@celery.task(name="extract_features")
+def extract_features(xml_info, parser_type):
     """
-    This task is trigerred once the project is created, i.e., when we 
+    This task is trigerred once the project is created, i.e., when we
     know the level of the features. Besides, it is triggered again when
     some changes are done on the features menu, or when new files are added
     """
 
     # Get the file
+    [uid, xml_uri] = xml_info
     _, name, suffix = info_from_uri(xml_uri)
 
     # Now, we call the function that parse the document and obtain the features
@@ -100,10 +107,13 @@ def extract_features(uid, xml_uri, parser_type):
     elif parser_type == "page":
         parser_name = "page_type"
     doc_parser = feature_parsing.get_available_parsers()[parser_name]
-    features_file = feature_parsing.extract_features_for_file(doc_parser, xml_uri)
+    features_file = feature_parsing.extract_features_for_file(
+        doc_parser, xml_uri)
 
     # The dataframe is returned, and then, we send it back to the server, that will
     # store it in the DBs
+    print(features_file.to_json(orient="records"))
+    return
     return features_file
 
     # TODO: here we are just sending for the moment the dataframe, as I was testing this
@@ -114,10 +124,10 @@ def extract_features(uid, xml_uri, parser_type):
     dict_data = {"status": "processed", "uid": uid, "data":
                  {"filename": name, "body": features_file, "content_type": "pandas"}}
     data = json.dumps(dict_data).encode("utf-8")
-    req = request.Request("http://localhost:8888/tasks/save_features", data=data)
+    req = request.Request(
+        "http://localhost:8888/tasks/save_features", data=data)
     req.add_header("Token", API_AUTH)
     request.urlopen(req)
     # Sending the request
     return {"status": True}
     """
-
