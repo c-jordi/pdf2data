@@ -133,7 +133,6 @@ class TaskHandler(SessionMixin, BaseHandler):
                 feat_extract.save_features(session, file_info)
             print("Features saved in the DB table.")
 
-<<<<<<< HEAD
 
 class SearchHandler(SessionMixin, BaseHandler):
     def post(self):
@@ -154,8 +153,6 @@ class SyncHandler(SessionMixin, BaseHandler):
             "suggestions": results
         })
 
-=======
->>>>>>> 7540a7982ca3e6d7bd02268a6da1acfc6f192c95
 
 handlers = [
     (r"/", StatusHandler),
