@@ -19,11 +19,8 @@ from .utils_files import extract_xml, clean_xml, get_text_onefile, \
     info_from_uri
 
 from application.features import feature_parsing
-<<<<<<< HEAD
+
 from .constants import API_AUTH, TMP_FOLDER, ROOT, UPLOAD_FOLDER
-=======
-from .constants import API_AUTH, TMP_FOLDER
->>>>>>> 7540a7982ca3e6d7bd02268a6da1acfc6f192c95
 
 
 celery = Celery(__name__)
@@ -89,11 +86,11 @@ def process_pdf(uid, uri):
     # Replace with the uri contained in the server response
     xml_uri = uri.replace(".pdf", ".xml")
 
-    return uid, xml_uri
+    return {"status": "PDFs processed.", "data": {"uid": uid, "xml_uri": xml_uri}}
 
 
 @celery.task(name="extract_features")
-def extract_features(xml_info, parser_type):
+def extract_features(chain_input, parser_type):
     """
     This task is trigerred once the project is created, i.e., when we
     know the level of the features. Besides, it is triggered again when
@@ -101,7 +98,8 @@ def extract_features(xml_info, parser_type):
     """
 
     # Get the file
-    [uid, xml_uri] = xml_info
+    uid = chain_input.get("data", {}).get("uid", None)
+    xml_uri = chain_input.get("data", {}).get("xml_uri", None)
     _, name, suffix = info_from_uri(xml_uri)
 
     # Now, we call the function that parse the document and obtain the features
@@ -116,65 +114,11 @@ def extract_features(xml_info, parser_type):
 
     # The dataframe is returned, and then, we send it back to the server, that will
     # store it in the DBs
-    print(features_file.to_json(orient="records"))
-    return
-    return features_file
-
-    # TODO: here we are just sending for the moment the dataframe, as I was testing this
-    # but this function needs to call the handler tasks/save_features, send the dataframe,
-    # and this will store this in the DB table Features
-
-    """
     dict_data = {"status": "processed", "uid": uid, "data":
-                 {"filename": name, "body": features_file, "content_type": "pandas"}}
+                 {"filename": name, "body": features_file.to_json(orient="records"), "content_type": "json", "keys": list(features_file.columns)}}
     data = json.dumps(dict_data).encode("utf-8")
     req = request.Request(
         "http://localhost:8888/tasks/save_features", data=data)
     req.add_header("Token", API_AUTH)
     request.urlopen(req)
-    # Sending the request
-    return {"status": True}
-<<<<<<< HEAD
-    """
-=======
-
-#@celery.task(name="extract_features")
-def extract_features(uid, xml_uri, parser_type):
-    """
-    This task is trigerred once the project is created, i.e., when we 
-    know the level of the features. Besides, it is triggered again when
-    some changes are done on the features menu, or when new files are added
-    """
-
-    # Get the file
-    _, name, suffix = info_from_uri(xml_uri)
-
-    # Now, we call the function that parse the document and obtain the features
-    parser_name = "textblock_type"
-    if parser_type == "textline":
-        parser_name = "textline_type"
-    elif parser_type == "page":
-        parser_name = "page_type"
-    doc_parser = feature_parsing.get_available_parsers()[parser_name]
-    features_file = feature_parsing.extract_features_for_file(doc_parser, xml_uri)
-
-    # The dataframe is returned, and then, we send it back to the server, that will
-    # store it in the DBs
-    return features_file
-
-    # TODO: here we are just sending for the moment the dataframe, as I was testing this
-    # but this function needs to call the handler tasks/save_features, send the dataframe,
-    # and this will store this in the DB table Features
-
-    """
-    dict_data = {"status": "processed", "uid": uid, "data":
-                 {"filename": name, "body": features_file, "content_type": "pandas"}}
-    data = json.dumps(dict_data).encode("utf-8")
-    req = request.Request("http://localhost:8888/tasks/save_features", data=data)
-    req.add_header("Token", API_AUTH)
-    request.urlopen(req)
-    # Sending the request
-    return {"status": True}
-    """
-
->>>>>>> 7540a7982ca3e6d7bd02268a6da1acfc6f192c95
+    return

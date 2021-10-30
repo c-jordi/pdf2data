@@ -1,3 +1,4 @@
+import json
 from sqlalchemy.sql.expression import bindparam
 import tornado.web
 import tornado.websocket
@@ -107,7 +108,6 @@ class TaskHandler(SessionMixin, BaseHandler):
         if token != API_AUTH:
             return 401
 
-        # Simply save xml in storage endpoint
         if task_name == "save_xml":
             data = json_decode(self.request.body)
             file_info = {"filename": data["data"]["filename"], "body": data["data"]["body"],
@@ -116,21 +116,11 @@ class TaskHandler(SessionMixin, BaseHandler):
                 storage.add_xml(session, data['uid'], file_info)
             print("XML file has been saved.")
 
-        if task_name == "extract_features":
-            # TODO: when calling this, we need to provide also the project_id where we are working now
-            data = json_decode(self.request.body)
-            project_id = data["project_id"]
-            with self.make_session() as session:
-                feat_extract.extract_features(session, project_id)
-            print("Features extracted from all files.")
-
         if task_name == "save_features":
-            # TODO
             data = json_decode(self.request.body)
-            file_info = {"filename": data["data"]["filename"], "body": data["data"]["body"],
-                         "content_type": data["data"]["content_type"]}
+            file_info = data["data"]
             with self.make_session() as session:
-                feat_extract.save_features(session, file_info)
+                feat_extract.save_features(session, data["uid"], file_info)
             print("Features saved in the DB table.")
 
 

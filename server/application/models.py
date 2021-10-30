@@ -124,42 +124,19 @@ class Source(db.Model):
                 setattr(self, key, value)
 
 
-class Page(db.Model):
-    __tablename__ = 'pages'
-    id = Column(Integer, primary_key=True)
-    uid = Column(String, unique=True)
-    source_id = Column(Integer, ForeignKey('sources.id'))
-    page_number = Column(Integer, nullable=False)
-    annotated = Column(Boolean, default=False)
-
-
 class Annotation(db.Model):
     __tablename__ = 'annotations'
     id = Column(Integer, primary_key=True)
     # This uid is inherited from the Feature table
     uid = Column(String, unique=True)
     casestudy_id = Column(Integer, ForeignKey('casestudies.id'))
-    # This refer to the id in the pages table
-    page_tableid = Column(Integer, ForeignKey('pages.id'))
-    # This is just the page number for the file
-    page_id = Column(Integer)
+    casestudy_uid = Column(String)
+    page_nbr = Column(Integer)
     bbox = Column(String)
     time_labelling = Column(String)
     user_labelling = Column(String)
     split = Column(String)
 
-class Feature(db.Model):
-    __tablename__ = 'features'
-    id = Column(Integer, primary_key=True)
-    # The uid for the Features is just the filename, the page_id and the id
-    uid = Column(String, unique=True)
-    project_id = Column(Integer, ForeignKey('projects.id'))
-    # This refer to the id in the pages table
-    page_tableid = Column(Integer, ForeignKey('pages.id'))
-    # This is just the page number for the file
-    page_id = Column(Integer)
-    bbox = Column(String)
-
 
 class Feature(db.Model):
     __tablename__ = 'features'
@@ -167,10 +144,7 @@ class Feature(db.Model):
     # The uid for the Features is just the filename, the page_id and the id
     uid = Column(String, unique=True)
     project_id = Column(Integer, ForeignKey('projects.id'))
-    # This refer to the id in the pages table
-    page_tableid = Column(Integer, ForeignKey('pages.id'))
-    # This is just the page number for the file
-    page_id = Column(Integer)
+    page_uid = Column(Integer)
     bbox = Column(String)
 
 
