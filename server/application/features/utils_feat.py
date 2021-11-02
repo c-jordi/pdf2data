@@ -65,7 +65,7 @@ def get_vocab(text_ext_col, min_ocurr = 10, flag_lower = 1, flag_stopw = 1, n_wo
         if len(ind_aux):
             ind_rem.append(ind_aux)
     print('Removed stopwords')
-    ind_keep = np.setdiff1d(np.arange(len(vocab)),ind_rem)
+    ind_keep = np.setdiff1d(np.arange(len(vocab)),ind_rem) 
     vocab = vocab[ind_keep]
     ocurrence = ocurrence[ind_keep]
     
@@ -81,7 +81,10 @@ def create_save_vocab(feature_mat, min_ocurr = 20, n_words = 400,
     """
     print("-- Creating vocabulary")
     
-    text_col = np.array(feature_mat['blocktext'])
+    type_text = np.intersect1d(["blocktext", "linetext", "pagetext"], feature_mat.columns)[0]
+
+    text_col = np.array(feature_mat[type_text])
+
     vocab_final, ocurrence = get_vocab(text_col, min_ocurr = min_ocurr, flag_lower = flag_lower, 
                                             flag_stopw = flag_stopw, n_words = n_words)        
     print('Vocabulary computed')

@@ -16,9 +16,9 @@ import xml.etree.ElementTree as ET
 
 from .utils_files import extract_xml, clean_xml, get_text_onefile, \
     convert_textlines_in_xml_tree, create_tmp, \
-    info_from_uri, create_save_vocab
+    info_from_uri
 
-from application.features import feature_parsing
+from application.features import feature_parsing, utils_feat
 
 from .constants import API_AUTH, TMP_FOLDER, ROOT, UPLOAD_FOLDER
 
@@ -126,7 +126,7 @@ def extract_features(chain_input, parser_type):
 # TODO: this task will get started once all the feature extraction has ended
 # OR, when new files are added, hence more text is in place, and we can recompute
 # the vocabulary
-def create_vocab(chain_input):
+def create_vocab(chain_input, filename = 'vocab_created.pkl'):
     """
     This task is trigerred onceall features are extracted, to compute the vocabulary
     from the block 
@@ -138,17 +138,19 @@ def create_vocab(chain_input):
 
     # TODO: at some point, these parameters will be drawn from a table, with all
     # these parameters 
-    vocab_final = create_save_vocab(feature_mat, min_ocurr = 20, n_words = 400, flag_lower = 1, 
-                                    flag_stopw = 1)
-    filename = 'vocab_created.pkl'
+    min_ocurr = 5
+    n_words = 20
+    flag_lower = 1
+    flag_stopw = 1
+
+    vocab_final = utils_feat.create_save_vocab(feature_mat, min_ocurr, n_words, flag_lower, 
+                                    flag_stopw)
 
     # The dataframe is returned, and then, we send it back to the server, that will
     # save the file and create a new entry in the Table sources
     dict_data = {"status": "processed", "uid": uid_proj, "data":
-                 {"filename": filename, "body": vocab_final, "content_type": "pkl"}}
+                 {"filename": filename, "body": list(vocab_final), "content_type": "pkl"}}
     data = json.dumps(dict_data).encode("utf-8")
     req = request.Request("http://localhost:8888/tasks/save_vocab", data=data)
     req.add_header("Token", API_AUTH)
     request.urlopen(req)
-
-    return    
