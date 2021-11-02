@@ -73,29 +73,19 @@ def get_vocab(text_ext_col, min_ocurr = 10, flag_lower = 1, flag_stopw = 1, n_wo
     vocab_final = vocab[ocurrence > min_ocurr][ind_ch]
     return vocab_final, ocurrence[ocurrence > min_ocurr][ind_ch]
 
-def create_save_vocab(data_path_feat, file_name, in_year, end_year, 
-                    min_ocurr = 20, n_words = 400,
-                    flag_lower = 1, flag_stopw = 1,
-                    flag_force = False):
+def create_save_vocab(feature_mat, min_ocurr = 20, n_words = 400,
+                    flag_lower = 1, flag_stopw = 1):
     """
     Given some input column with text, obtains a vocabulary using the
     parameters defined by the user for the specific case study
     """
-    if (not os.path.exists(file_name)) or flag_force:
-        print("-- Creating vocabulary")
-        text_col = np.array([]).reshape((0,))
-        for year in range(in_year, end_year + 1):
-            print(year)
-            pd_feat = pd.read_pickle('%s/%s.pickle' % (data_path_feat, str(year)))
-            text_col = np.concatenate([text_col,np.array(pd_feat['blocktext'])], axis = 0)
-
-        vocab_final, ocurrence = get_vocab(text_col, min_ocurr = min_ocurr, flag_lower = flag_lower, 
-                                                flag_stopw = flag_stopw, n_words = n_words)
-
-        pickle.dump(vocab_final, open(file_name,'wb'))
-        print('File created: {}'.format(file_name))
-    else:
-        print('Exists already')
+    print("-- Creating vocabulary")
+    
+    text_col = np.array(feature_mat['blocktext'])
+    vocab_final, ocurrence = get_vocab(text_col, min_ocurr = min_ocurr, flag_lower = flag_lower, 
+                                            flag_stopw = flag_stopw, n_words = n_words)        
+    print('Vocabulary computed')
+    return vocab_final
 
 def get_alltext(text_ext_col):
     """

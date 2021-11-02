@@ -444,13 +444,18 @@ class ByBlock(features.LineLevelFeatures):
             for block in page.findall(".//textbox"):
                 
                 all_textlines = block.findall(".//textline")
-                all_bboxes = [str(l.attrib["bbox"]) for l in all_textlines]
-                
-                feats = self.featureSet.scalar_features_line_collection(all_textlines, filename=filename)
 
-                feature_collector.append(feats)
-                bbox_ids_all.extend(all_bboxes)
-                page_ids.extend(len(all_textlines)*[int(page.attrib["id"])])                         
+                # This condition is again introduced in Sept21, as now the XML
+                # may include these extra elements, without textline inside, that 
+                # were causing this error
+                if len(all_textlines):
+                    all_bboxes = [str(l.attrib["bbox"]) for l in all_textlines]
+                    
+                    feats = self.featureSet.scalar_features_line_collection(all_textlines, filename=filename)
+
+                    feature_collector.append(feats)
+                    bbox_ids_all.extend(all_bboxes)
+                    page_ids.extend(len(all_textlines)*[int(page.attrib["id"])])                         
 
         index_df = pd.DataFrame(data=dict(page_id=page_ids, bbox=bbox_ids_all))
         final_feature_matrix = np.concatenate(feature_collector, axis=0)

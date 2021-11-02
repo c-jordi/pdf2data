@@ -123,6 +123,14 @@ class TaskHandler(SessionMixin, BaseHandler):
                 feat_extract.save_features(session, data["uid"], file_info)
             print("Features saved in the DB table.")
 
+        if task_name == "save_pkl":
+            data = json_decode(self.request.body)
+            file_info = {"filename": data["data"]["filename"], "body": data["data"]["body"],
+                         "content_type": data["data"]["content_type"]}
+            with self.make_session() as session:
+                storage.add_pkl(session, data['uid'], file_info)
+            print("{} file has been saved.".format(file_info["content_type"]))            
+
 
 class SearchHandler(SessionMixin, BaseHandler):
     def post(self):

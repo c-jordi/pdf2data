@@ -50,12 +50,16 @@ class AggregateByPage(features.PageLevelFeatures):
         for page in document_tree.findall(".//page"):
             all_textlines = page.findall(".//textline")
 
-            feats = self.featureSet.scalar_features_line_collection(all_textlines, filename=filename)
+            # This condition is again introduced in Sept21, as now the XML
+            # may include these extra elements, without textline inside, that 
+            # were causing this error
+            if len(all_textlines):
+                feats = self.featureSet.scalar_features_line_collection(all_textlines, filename=filename)
 
-            aggregated_features = self.aggregate(feats)
+                aggregated_features = self.aggregate(feats)
 
-            page_ids.append(int(page.attrib["id"]))
-            feature_collector_all.append(aggregated_features[None, :]) # make sure it's a row vector
+                page_ids.append(int(page.attrib["id"]))
+                feature_collector_all.append(aggregated_features[None, :]) # make sure it's a row vector
 
         index_df = pd.DataFrame(data=dict(page_id = page_ids))
         final_feature_matrix = np.concatenate(feature_collector_all, axis=0)

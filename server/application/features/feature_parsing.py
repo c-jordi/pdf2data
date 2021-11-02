@@ -98,7 +98,7 @@ class Document2FeaturesParser:
 
             # THIS IS REQUIRED FROM Sept 28th, 2021, since we have some
             # extra hierarchy in the XML, with textgroup, and inside of them
-            # we find the textboxes duplicated
+            # we find the textboxes duplicated. The valid textboxes are the first ones
             ids_un = ids.drop_duplicates()
             ind_use = ids_un.index
             ids_un = ids_un.reset_index(drop = True)

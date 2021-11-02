@@ -6,6 +6,8 @@ from pathlib import Path
 from urllib import request, parse
 import xml.etree.ElementTree as ET
 
+import pickle as pkl
+
 import xmltodict
 
 from .models import Source
@@ -54,13 +56,13 @@ def upload_pdf(session, file):
     # proc_extractxml_id = proc_extractxml(uid, pdf_uri)  # Begin the extraction of the xml
 
     new_source = Source(uid=uid, filename=filename,
-                        pdf_uri=pdf_uri)
+                        main_uri=pdf_uri)
 
     session.add(new_source)
     session.commit()
 
     return {
-        'pdf_uri': pdf_uri,
+        'main_uri': pdf_uri,
         'size': str(round(len(body) / 1e6, 2)) + "MB",
         'filename': filename,
         'uid': uid
@@ -98,6 +100,32 @@ def add_xml(session, uid: str, file: object):
         "proc_extractxml_status": "done"
     })
 
+def add_pkl(session, uid: str, file: object):
+    """Creates pickle from content passed, assigning a uid, saving it and adding to source table
+
+    Args:
+        session :
+        uid : source unique identifier
+        file : file object
+    """
+    filename, content_body, content_type = file["filename"], file["body"], file["content_type"]
+    name = Path(filename).stem + Path(filename).suffix
+    fname = uid + SEP_UID_NAME + name
+    pkl_uri = ROOT + UPLOAD_FOLDER + fname
+
+    # The saving of an xml tree is slightly different
+    name_out = "application/" + UPLOAD_FOLDER + fname
+    if content_type == "pkl":
+        pkl.dump(content_body, open(name_out, 'wb'))
+        print("> Storage | Save: PKL file")
+        print("Saved at:", name_out)
+
+        new_source = Source(uid=uid, filename=filename,
+                            main_uri=pkl_uri)
+        session.add(new_source)
+        session.commit()        
+    else:
+        print("Mismatch! Not PKL, but rather {}".format(content_type))
 
 def update(session, uid, data):
     """Update source file.

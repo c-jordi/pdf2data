@@ -98,17 +98,17 @@ class Source(db.Model):
     uid = Column(String, unique=True)
     project_id = Column(Integer, ForeignKey('projects.id'))
     filename = Column(String, nullable=False)
-    pdf_uri = Column(String, nullable=False, unique=True)
+    main_uri = Column(String, nullable=False, unique=True)
     xml_uri = Column(String, unique=True)
     proc_extractxml_id = Column(String)
     proc_extractxml_status = Column(String)
     init_date = Column(String)
 
-    def __init__(self, uid, filename, pdf_uri, project_id=None, proc_extractxml_id=None):
+    def __init__(self, uid, filename, main_uri, project_id=None, proc_extractxml_id=None):
         self.uid = uid
         self.filename = filename
         self.project_id = project_id
-        self.pdf_uri = pdf_uri
+        self.main_uri = main_uri
         self.proc_extractxml_id = proc_extractxml_id
         self.init_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 

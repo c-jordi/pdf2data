@@ -45,15 +45,19 @@ class AggregateByBlock(features.BlockLevelFeatures):
             for block in page.findall(".//textbox"):
                 all_textlines = block.findall(".//textline")
 
-                feats = self.featureSet.scalar_features_line_collection(all_textlines, filename=filename)
+                # This condition is again introduced in Sept21, as now the XML
+                # may include these extra elements, without textline inside, that 
+                # were causing this error
+                if len(all_textlines):
+                    feats = self.featureSet.scalar_features_line_collection(all_textlines, filename=filename)
 
-                if len(feats):
-                    aggregated_features = self.aggregate(feats)
-    
-                    if 'bbox' in block.keys():
-                        page_ids.append(int(page.attrib["id"]))
-                        bbox.append(block.attrib["bbox"])
-                        feature_collector_all.append(aggregated_features[None, :]) # make sure it's a row vector
+                    if len(feats):
+                        aggregated_features = self.aggregate(feats)
+        
+                        if 'bbox' in block.keys():
+                            page_ids.append(int(page.attrib["id"]))
+                            bbox.append(block.attrib["bbox"])
+                            feature_collector_all.append(aggregated_features[None, :]) # make sure it's a row vector
 
         index_df = pd.DataFrame(data=dict(page_id = page_ids, bbox = bbox))
         final_feature_matrix = np.concatenate(feature_collector_all, axis=0)
