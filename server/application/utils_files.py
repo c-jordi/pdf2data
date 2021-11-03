@@ -12,7 +12,11 @@ from urllib import request, parse
 from pdfminer.layout import LAParams
 from pdfminer.high_level import extract_text_to_fp
 
-from .constants import TMP_FOLDER, TMP_SUFFIX, SEP_UID_NAME
+from pdf2image import convert_from_path
+
+import matplotlib.pyplot as plt
+
+from .constants import TMP_FOLDER, TMP_SUFFIX, SEP_UID_NAME, IMG_FOLDER, POPPLER_PATH
 
 def extract_xml(uri):
     """
@@ -208,4 +212,19 @@ def convert_textlines_in_xml_tree(orig):
             tL.append(text_block_element)
 
     return new
+
+def pdf2imgobj(pdf_uri, resolution = 150, first_page=None, last_page=None):
+    """
+    Function that receives the pdf_uri and obtain the images, for some pages, 
+    storing them directly in the folder for tmp images
+    """
+    uid, filename, suffix = info_from_uri(pdf_uri)
+
+    img_obj_array_tmp = convert_from_path(pdf_uri, dpi = resolution, first_page = first_page, last_page = last_page,
+                        poppler_path=POPPLER_PATH)
+
+    for image, page_numb in zip(img_obj_array_tmp,range(first_page, last_page + 1)):
+        fname = os.path.join(IMG_FOLDER, filename + '_' + str(page_numb) + '.png')
+        plt.imsave(fname, np.asarray(image))
+
 
