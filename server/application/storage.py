@@ -10,7 +10,7 @@ import pickle as pkl
 
 import xmltodict
 
-from .models import Source
+from .models import Project, Source
 from .constants import ROOT, UPLOAD_FOLDER, SEP_UID_NAME
 from . import tasks
 
@@ -100,13 +100,15 @@ def add_xml(session, uid: str, file: object):
         "proc_extractxml_status": "done"
     })
 
-def add_pkl(session, uid: str, file: object):
+
+def add_pkl(session, uid: str, file: object, project_uid=None):
     """Creates pickle from content passed, assigning a uid, saving it and adding to source table
 
     Args:
         session :
         uid : source unique identifier
         file : file object
+        project_uid : parent project uid
     """
     filename, content_body, content_type = file["filename"], file["body"], file["content_type"]
     name = Path(filename).stem + Path(filename).suffix
@@ -119,13 +121,20 @@ def add_pkl(session, uid: str, file: object):
         pkl.dump(content_body, open(name_out, 'wb'))
         print("> Storage | Save: PKL file")
         print("Saved at:", name_out)
-
         new_source = Source(uid=uid, filename=filename,
-                            main_uri=pkl_uri)
+                            main_uri=pkl_uri, filetype="pkl")
         session.add(new_source)
-        session.commit()        
+        session.commit()
+
+        if project_uid:
+            project = session.query(Project).filter_by(uid=project_uid).first()
+            project.sources.append(new_source)
+            new_source.project_id = project.id
+            session.commit()
+
     else:
         print("Mismatch! Not PKL, but rather {}".format(content_type))
+
 
 def update(session, uid, data):
     """Update source file.
