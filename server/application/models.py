@@ -41,6 +41,7 @@ class Project(db.Model):
 
 class Casestudy(db.Model):
     __tablename__ = "casestudies"
+
     id = Column(Integer, primary_key=True)
     uid = Column(String, unique=True)
     name = Column(String)
@@ -94,19 +95,22 @@ uri: the localhost location of the file + uid + _ + filename
 
 class Source(db.Model):
     __tablename__ = 'sources'
+
     id = Column(Integer, primary_key=True)
     uid = Column(String, unique=True)
     project_id = Column(Integer, ForeignKey('projects.id'))
     filename = Column(String, nullable=False)
+    filetype = Column(String, nullable=False)
     main_uri = Column(String, nullable=False, unique=True)
     xml_uri = Column(String, unique=True)
     proc_extractxml_id = Column(String)
     proc_extractxml_status = Column(String)
     init_date = Column(String)
 
-    def __init__(self, uid, filename, main_uri, project_id=None, proc_extractxml_id=None):
+    def __init__(self, uid, filename, main_uri, filetype="pdf", project_id=None, proc_extractxml_id=None):
         self.uid = uid
         self.filename = filename
+        self.filetype = filetype
         self.project_id = project_id
         self.main_uri = main_uri
         self.proc_extractxml_id = proc_extractxml_id
@@ -126,6 +130,7 @@ class Source(db.Model):
 
 class Annotation(db.Model):
     __tablename__ = 'annotations'
+
     id = Column(Integer, primary_key=True)
     # This uid is inherited from the Feature table
     uid = Column(String, unique=True)
@@ -140,6 +145,7 @@ class Annotation(db.Model):
 
 class Feature(db.Model):
     __tablename__ = 'features'
+
     id = Column(Integer, primary_key=True)
     # The uid for the Features is just the filename, the page_id and the id
     uid = Column(String, unique=True)
