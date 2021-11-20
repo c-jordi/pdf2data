@@ -4,6 +4,7 @@ import time
 import subprocess
 import tempfile
 import json
+import pandas as pd
 from urllib import request, parse
 from pathlib import Path
 from celery import Celery
@@ -121,36 +122,40 @@ def extract_features(chain_input, parser_type):
         "http://localhost:8888/tasks/save_features", data=data)
     req.add_header("Token", API_AUTH)
     request.urlopen(req)
-    return
+    return {"status": "Features extracted.", "data": {"uid": uid, "features_json": features_file.to_json(orient="records")}}
 
 # TODO: this task will get started once all the feature extraction has ended
 # OR, when new files are added, hence more text is in place, and we can recompute
 # the vocabulary
-def create_vocab(chain_input, filename = 'vocab_created.pkl'):
+
+
+@celery.task(name="create_vocab")
+def create_vocab(chain_input, project_uid, filename='vocab_created.pkl'):
     """
     This task is trigerred onceall features are extracted, to compute the vocabulary
     from the block 
     """
 
-    # Get the info required, and the 
-    feature_mat = chain_input.get("data", {}).get("feature_mat", None)
-    uid_proj = chain_input.get("data", {}).get("uid_proj", None)
+    # Get the info required
+    pdf_uid = chain_input.get("data", {}).get("uid", None)
+    features_json = chain_input.get("data", {}).get("features_json", None)
+    features_df = pd.read_json(features_json, orient="records")
 
     # TODO: at some point, these parameters will be drawn from a table, with all
-    # these parameters 
+    # these parameters
     min_ocurr = 5
     n_words = 20
     flag_lower = 1
     flag_stopw = 1
 
-    vocab_final = utils_feat.create_save_vocab(feature_mat, min_ocurr, n_words, flag_lower, 
-                                    flag_stopw)
+    vocab_final = utils_feat.create_save_vocab(features_df, min_ocurr, n_words, flag_lower,
+                                               flag_stopw)
 
     # The dataframe is returned, and then, we send it back to the server, that will
     # save the file and create a new entry in the Table sources
-    dict_data = {"status": "processed", "uid": uid_proj, "data":
+    dict_data = {"status": "processed", "project_uid": project_uid, "pdf_uid": pdf_uid, "uid": pdf_uid + "_voc", "data":
                  {"filename": filename, "body": list(vocab_final), "content_type": "pkl"}}
     data = json.dumps(dict_data).encode("utf-8")
-    req = request.Request("http://localhost:8888/tasks/save_vocab", data=data)
+    req = request.Request("http://localhost:8888/tasks/save_pkl", data=data)
     req.add_header("Token", API_AUTH)
     request.urlopen(req)
