@@ -125,11 +125,12 @@ class TaskHandler(SessionMixin, BaseHandler):
 
         if task_name == "save_pkl":
             data = json_decode(self.request.body)
-            file_info = {"filename": data["data"]["filename"], "body": data["data"]["body"],
-                         "content_type": data["data"]["content_type"]}
+            file_info = data["data"]
+            project_uid = data.get("project_uid", None)
             with self.make_session() as session:
-                storage.add_pkl(session, data['uid'], file_info)
-            print("{} file has been saved.".format(file_info["content_type"]))            
+                storage.add_pkl(
+                    session, data['uid'], file_info, project_uid=project_uid)
+            print("{} file has been saved.".format(file_info["content_type"]))
 
 
 class SearchHandler(SessionMixin, BaseHandler):
