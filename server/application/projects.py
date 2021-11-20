@@ -58,7 +58,7 @@ def preprocess(new_project):
         new_project 
     """
     feature_level = new_project.level
-    header = [tasks.process_pdf.s(s.uid, s.pdf_uri) | tasks.extract_features.s(feature_level)
+    header = [tasks.process_pdf.s(s.uid, s.main_uri) | tasks.extract_features.s(feature_level) | tasks.create_vocab.s(new_project.uid)
               for s in new_project.sources]
     task = group(header).delay()
 
