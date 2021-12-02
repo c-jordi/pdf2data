@@ -4,7 +4,7 @@
 
 ## From the [Chair of Systems Design, ETHZ](https://www.sg.ethz.ch/) and the [Swiss Data Science Center](https://datascience.ch/).
 
-## 💡 Approach
+## 💡 Vision
 
 > Develop an <orange>open source</orange> and <orange>user-friendly</orange> tool for <green>technical</green> and <green>non-technical</green> users that performs <purple>page, block & textline</purple> <red>segmentation</red> and combines both <turquoise>manual & automatic</turquoise> annotation.
 
