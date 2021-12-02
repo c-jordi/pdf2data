@@ -1,12 +1,16 @@
 # pdf2data : A pdf segmentation and annotation tool for archival documents.
 
+## 🚧 IN DEVELOPMENT 🚧
+
 ## From the [Chair of Systems Design, ETHZ](https://www.sg.ethz.ch/) and the [Swiss Data Science Center](https://datascience.ch/).
 
 ## 💡 Approach
 
-<approach>
-Develop an <orange>open source</orange> and <orange>user-friendly</orange> tool for <green>technical</green> and <green>non-technical</green> users that performs <purple>page, block a& textline</purple> <red>segmentation</red> and combines both <turquoise>manual & automatic</turquoise> annotation.
-</approach>
+> Develop an <orange>open source</orange> and <orange>user-friendly</orange> tool for <green>technical</green> and <green>non-technical</green> users that performs <purple>page, block & textline</purple> <red>segmentation</red> and combines both <turquoise>manual & automatic</turquoise> annotation.
+
+## 🎥 Preview
+
+![Preview](./preview.gif)
 
 ## 🔥 Features
 
@@ -18,6 +22,35 @@ Develop an <orange>open source</orange> and <orange>user-friendly</orange> tool 
 
 ## 🚀 Quickstart
 
+### Development
+
+Start the message broker:
+
+```bash
+docker-compose up
+```
+
+Start the backend:
+
+```bash
+source server/venv/bin/activate
+make run
+```
+
+Start the worker:
+
+```bash
+source server/venv/bin/activate
+make worker
+```
+
+Start the client:
+
+```bash
+cd client
+yarn start
+```
+
 ## 🧮 Data Composition
 
 <image src="./docs/structure.png" width=600 alt="Data composition"/>
@@ -26,42 +59,6 @@ Develop an <orange>open source</orange> and <orange>user-friendly</orange> tool 
 
 <image src="./docs/architecture.png" width=600 alt="Architecture"/>
 
-- **Node.js** and **React.js** run the interactive dashboard.
+- **Node.js** and **React.js** deliver the interactive dashboard.
 - **Tornado** runs the data backend.
-- ***
-
-<style>
-approach{
-    line-height: 2rem;
-}
-orange {
-    padding:3px;
-    background-color:orange;
-    border-radius:3px;
-    color:black;
-}
-green {
-    padding:3px;
-    background-color:green;
-    border-radius:3px;
-    color:black;
-}
-turquoise {
-    padding:3px;
-    background-color:turquoise;
-    border-radius:3px;
-    color:black;
-}
-purple {
-    padding:3px;
-    background-color:purple;
-    border-radius:3px;
-    color:black;
-}
-red {
-    padding:3px;
-    background-color:red;
-    border-radius:3px;
-    color:black;
-}
-</style>
+- **Celery** with a **RabbitMQ** backend operates the execution of asynchronous tasks.
