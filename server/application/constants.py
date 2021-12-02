@@ -5,3 +5,5 @@ TMP_FOLDER = "/var/tmp/"
 TMP_SUFFIX = "_tmp"
 SEP_UID_NAME = "_S_"
 API_AUTH = "112233"
+IMG_FOLDER = 'assets/imgs'
+POPPLER_PATH='/usr/local/bin'

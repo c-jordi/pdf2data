@@ -1,3 +1,4 @@
+import json
 from sqlalchemy.sql.expression import bindparam
 import tornado.web
 import tornado.websocket
@@ -9,6 +10,7 @@ from .constants import API_PREFIX, UPLOAD_FOLDER, API_AUTH
 from .schemas import SchemaError, project_req_schema, project_upd_schema
 from . import projects
 from . import storage
+from . import feat_extract
 from . import annotator
 from . import search
 
@@ -68,6 +70,7 @@ class ProjectHandler(SessionMixin, BaseHandler):
 
 class FileStorageHandler(SessionMixin, BaseHandler):
     def get(self, path):
+        print("path:", path)
         with self.make_session() as session:
             content_type, binary_data = storage.get(path)
         self.add_header('Content-Type', content_type)
@@ -105,7 +108,6 @@ class TaskHandler(SessionMixin, BaseHandler):
         if token != API_AUTH:
             return 401
 
-        # Simply save xml in storage endpoint
         if task_name == "save_xml":
             data = json_decode(self.request.body)
             file_info = {"filename": data["data"]["filename"], "body": data["data"]["body"],
@@ -113,6 +115,22 @@ class TaskHandler(SessionMixin, BaseHandler):
             with self.make_session() as session:
                 storage.add_xml(session, data['uid'], file_info)
             print("XML file has been saved.")
+
+        if task_name == "save_features":
+            data = json_decode(self.request.body)
+            file_info = data["data"]
+            with self.make_session() as session:
+                feat_extract.save_features(session, data["uid"], file_info)
+            print("Features saved in the DB table.")
+
+        if task_name == "save_pkl":
+            data = json_decode(self.request.body)
+            file_info = data["data"]
+            project_uid = data.get("project_uid", None)
+            with self.make_session() as session:
+                storage.add_pkl(
+                    session, data['uid'], file_info, project_uid=project_uid)
+            print("{} file has been saved.".format(file_info["content_type"]))
 
 
 class SearchHandler(SessionMixin, BaseHandler):

@@ -1,5 +1,5 @@
 clean-db:
-	rm -f db.sqlite & python3 ./application/models.py
+	rm -f db.sqlite & rm -f ./application/storage/* & python3 ./application/models.py
 
 worker:
 	celery -A application.tasks worker -l INFO

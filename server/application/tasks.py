@@ -4,9 +4,11 @@ import time
 import subprocess
 import tempfile
 import json
+import pandas as pd
 from urllib import request, parse
 from pathlib import Path
 from celery import Celery
+from celery.result import AsyncResult
 
 import xmltodict
 
@@ -16,7 +18,10 @@ import xml.etree.ElementTree as ET
 from .utils_files import extract_xml, clean_xml, get_text_onefile, \
     convert_textlines_in_xml_tree, create_tmp, \
     info_from_uri
-from .constants import API_AUTH, TMP_FOLDER
+
+from application.features import feature_parsing, utils_feat
+
+from .constants import API_AUTH, TMP_FOLDER, ROOT, UPLOAD_FOLDER
 
 
 celery = Celery(__name__)
@@ -36,6 +41,7 @@ def process_pdf(uid, uri):
     Returns:
         (object) : Status info
     """
+    print("UID:", uid, "URI", uri)
     # Get the file
     uid, name, suffix = info_from_uri(uri)
 
@@ -56,15 +62,15 @@ def process_pdf(uid, uri):
     xml_tree = ET.ElementTree(root_xml)
     # 5. Saving tmp xml into file, to open it again as str, and then
     # allow it serialization
-    uri_xml = create_tmp(name + '.xml')
-    xml_tree.write(uri_xml, encoding='utf-8')
+    xml_uri_tmp = create_tmp(name + '.xml')
+    xml_tree.write(xml_uri_tmp, encoding='utf-8')
     # 6. Reading the str from the xml file
-    with open(uri_xml, 'r') as f:
+    with open(xml_uri_tmp, 'r') as f:
         all_text = f.readlines()
     xml_dict = xmltodict.parse('\n'.join(all_text))
     # 7. Removing all tmp created
     os.remove(uri_out)
-    os.remove(uri_xml)
+    os.remove(xml_uri_tmp)
 
     # Once obtained all the information from the pdf, we need to contact the handlers to
     # stored the generated files, and add the files to the source table in the DB
@@ -77,5 +83,79 @@ def process_pdf(uid, uri):
     req = request.Request("http://localhost:8888/tasks/save_xml", data=data)
     req.add_header("Token", API_AUTH)
     request.urlopen(req)
-    # Sending the request
-    return {"status": True}
+
+    # Replace with the uri contained in the server response
+    xml_uri = uri.replace(".pdf", ".xml")
+
+    return {"status": "PDFs processed.", "data": {"uid": uid, "xml_uri": xml_uri}}
+
+
+@celery.task(name="extract_features")
+def extract_features(chain_input, parser_type):
+    """
+    This task is trigerred once the project is created, i.e., when we
+    know the level of the features. Besides, it is triggered again when
+    some changes are done on the features menu, or when new files are added
+    """
+
+    # Get the file
+    uid = chain_input.get("data", {}).get("uid", None)
+    xml_uri = chain_input.get("data", {}).get("xml_uri", None)
+    _, name, suffix = info_from_uri(xml_uri)
+
+    # Now, we call the function that parse the document and obtain the features
+    parser_name = "textblock_type"
+    if parser_type == "textline":
+        parser_name = "textline_type"
+    elif parser_type == "page":
+        parser_name = "page_type"
+    doc_parser = feature_parsing.get_available_parsers()[parser_name]
+    features_file = feature_parsing.extract_features_for_file(
+        doc_parser, xml_uri)
+
+    # The dataframe is returned, and then, we send it back to the server, that will
+    # store it in the DBs
+    dict_data = {"status": "processed", "uid": uid, "data":
+                 {"filename": name, "body": features_file.to_json(orient="records"), "content_type": "json", "keys": list(features_file.columns)}}
+    data = json.dumps(dict_data).encode("utf-8")
+    req = request.Request(
+        "http://localhost:8888/tasks/save_features", data=data)
+    req.add_header("Token", API_AUTH)
+    request.urlopen(req)
+    return {"status": "Features extracted.", "data": {"uid": uid, "features_json": features_file.to_json(orient="records")}}
+
+# TODO: this task will get started once all the feature extraction has ended
+# OR, when new files are added, hence more text is in place, and we can recompute
+# the vocabulary
+
+
+@celery.task(name="create_vocab")
+def create_vocab(chain_input, project_uid, filename='vocab_created.pkl'):
+    """
+    This task is trigerred onceall features are extracted, to compute the vocabulary
+    from the block 
+    """
+
+    # Get the info required
+    pdf_uid = chain_input.get("data", {}).get("uid", None)
+    features_json = chain_input.get("data", {}).get("features_json", None)
+    features_df = pd.read_json(features_json, orient="records")
+
+    # TODO: at some point, these parameters will be drawn from a table, with all
+    # these parameters
+    min_ocurr = 5
+    n_words = 20
+    flag_lower = 1
+    flag_stopw = 1
+
+    vocab_final = utils_feat.create_save_vocab(features_df, min_ocurr, n_words, flag_lower,
+                                               flag_stopw)
+
+    # The dataframe is returned, and then, we send it back to the server, that will
+    # save the file and create a new entry in the Table sources
+    dict_data = {"status": "processed", "project_uid": project_uid, "pdf_uid": pdf_uid, "uid": pdf_uid + "_voc", "data":
+                 {"filename": filename, "body": list(vocab_final), "content_type": "pkl"}}
+    data = json.dumps(dict_data).encode("utf-8")
+    req = request.Request("http://localhost:8888/tasks/save_pkl", data=data)
+    req.add_header("Token", API_AUTH)
+    request.urlopen(req)
